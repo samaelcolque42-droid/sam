@@ -276,6 +276,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
   .promo-grid{grid-template-columns:1fr}
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -785,22 +786,16 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
 </div>
 
 <script>
-// ===== DATA =====
+// ===== SUPABASE =====
+const SUPABASE_URL = 'https://xtxaurlrtoswghjqxcfo.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh0eGF1cmxydG9zd2doanF4Y2ZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1Mzk3NjYsImV4cCI6MjA5NzExNTc2Nn0.2n5tGKcZ_YeKVuIMPDi_B0kwHLgEUopMMVpvZ_arfrw';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// Local-only cache (kept for cart/UI state during a session)
 const LS = {
   get: k => { try { return JSON.parse(localStorage.getItem('kustom_'+k)) } catch(e){ return null } },
   set: (k,v) => localStorage.setItem('kustom_'+k, JSON.stringify(v)),
 };
-
-const defaultProducts = [
-  {id:1, name:'Hoodie Oversized', cat:'hombre', price:180, old:220, sizes:'S,M,L,XL', stock:15, desc:'Hoodie amplio estilo urbano, tela 100% algodón, disponible en negro y gris.', emoji:'🧥', img:'', sale:false, sold:12},
-  {id:2, name:'Jogger Cargo', cat:'hombre', price:150, old:190, sizes:'S,M,L,XL,XXL', stock:8, desc:'Pantalón jogger con bolsillos cargo, ajuste cómodo para el día a día.', emoji:'👖', img:'', sale:false, sold:7},
-  {id:3, name:'Camiseta Gráfica', cat:'mujer', price:90, old:0, sizes:'XS,S,M,L', stock:20, desc:'Camiseta con estampado gráfico exclusivo, tela suave y fresca.', emoji:'👕', img:'', sale:false, sold:18},
-  {id:4, name:'Legging Deportivo', cat:'mujer', price:110, old:150, sizes:'XS,S,M,L,XL', stock:12, desc:'Legging de alto rendimiento, tela elástica con sujeción perfecta.', emoji:'🩱', img:'', sale:false, sold:9},
-  {id:5, name:'Sneaker Urbano', cat:'calzado', price:320, old:380, sizes:'38,39,40,41,42,43', stock:6, desc:'Zapatilla urbana con suela gruesa, perfecta para el streetwear.', emoji:'👟', img:'', sale:false, sold:21},
-  {id:6, name:'Bota Chunky', cat:'calzado', price:290, old:360, sizes:'37,38,39,40,41', stock:4, desc:'Bota de plataforma, estilo robusto y moderno para cualquier look.', emoji:'🥾', img:'', sale:true, sold:5},
-  {id:7, name:'Gorra Snapback', cat:'accesorios', price:65, old:0, sizes:'Talla única', stock:30, desc:'Gorra ajustable con diseño streetwear, bordado en frente.', emoji:'🧢', img:'', sale:false, sold:33},
-  {id:8, name:'Chaqueta Bomber', cat:'mujer', price:210, old:270, sizes:'XS,S,M,L', stock:7, desc:'Chaqueta bomber reversible, dos estilos en una sola prenda.', emoji:'🧣', img:'', sale:true, sold:4},
-];
 
 const defaultConfig = {
   name:'KUSTOM', city:'La Paz · Bolivia', hero:'Ropa y calzado para jóvenes que marcan tendencia.',
@@ -809,24 +804,73 @@ const defaultConfig = {
   colors:{primary:'#D4E600',bg:'#0D0D0D',bg2:'#1A1A1A',card:'#181818',text:'#F0F0F0',border:'#2A2A2A'}
 };
 
-let products = LS.get('products') || defaultProducts;
-let users = LS.get('users') || [];
-let orders = LS.get('orders') || [];
-let config = LS.get('config') || defaultConfig;
+let products = [];
+let users = [];
+let orders = [];
+let config = defaultConfig;
 let cart = [];
-let wishlist = LS.get('wishlist') || [];
-let currentUser = LS.get('currentUser') || null;
+let wishlist = [];
+let currentUser = null;
 let currentProd = null;
 let selectedSize = '';
-let nextId = products.length ? Math.max(...products.map(p=>p.id))+1 : 1;
+
+// Map DB row (descripcion) <-> app field (desc)
+function mapProductFromDB(row){
+  return { id:row.id, name:row.name, cat:row.cat, price:Number(row.price), old:Number(row.old)||0,
+    sizes:row.sizes||'', stock:row.stock||0, desc:row.descripcion||'', emoji:row.emoji||'👕',
+    img:row.img||'', sale:!!row.sale, sold:row.sold||0 };
+}
+function mapProductToDB(p){
+  return { name:p.name, cat:p.cat, price:p.price, old:p.old||0, sizes:p.sizes||'',
+    stock:p.stock||0, descripcion:p.desc||'', emoji:p.emoji||'👕', img:p.img||'',
+    sale:!!p.sale, sold:p.sold||0 };
+}
 
 // ===== INIT =====
-function init(){
+async function init(){
+  await loadConfig();
   applyConfig();
   applyStoredColors();
+  await checkSession();
+  await loadProducts();
   renderCats();
   renderProds();
+  renderSale();
+  await loadWishlist();
   updateCartBadge();
+}
+
+async function loadConfig(){
+  const { data, error } = await sb.from('configuracion').select('*').eq('id',1).single();
+  if(error || !data){ config = defaultConfig; return; }
+  config = {
+    name:data.name, city:data.city, hero:data.hero, wa:data.wa, ig:data.ig,
+    addr:data.addr, hours:data.hours, adminPass:data.admin_pass,
+    colors: data.colors || defaultConfig.colors
+  };
+}
+
+async function loadProducts(){
+  const { data, error } = await sb.from('productos').select('*').order('id');
+  if(error){ console.error(error); products=[]; return; }
+  products = (data||[]).map(mapProductFromDB);
+}
+
+async function loadWishlist(){
+  if(!currentUser){ wishlist=[]; return; }
+  const { data, error } = await sb.from('favoritos').select('product_id').eq('user_id', currentUser.id);
+  wishlist = error ? [] : (data||[]).map(r=>r.product_id);
+}
+
+async function checkSession(){
+  const { data } = await sb.auth.getSession();
+  if(data && data.session && data.session.user){
+    const uid = data.session.user.id;
+    const { data: profile } = await sb.from('usuarios').select('*').eq('id', uid).single();
+    if(profile){
+      currentUser = { id:uid, name:profile.name, email:profile.email, phone:profile.phone, role:profile.role||'user' };
+    }
+  }
 }
 
 function applyConfig(){
@@ -1006,23 +1050,29 @@ function changeQty(idx, d){
 
 function removeCartItem(idx){ cart.splice(idx,1); updateCartBadge(); renderCart(); }
 
-function checkout(){
+async function checkout(){
   if(!cart.length){ showToast('Tu carrito está vacío'); return; }
   if(!currentUser){ closeModal('cartModal'); openModal('authModal'); showToast('Inicia sesión para continuar'); return; }
   const total = cart.reduce((a,i)=>a+(i.price*i.qty),0);
   const order = {
     id: 'KUS'+Date.now(),
-    userId: currentUser.email,
-    userName: currentUser.name,
+    user_id: currentUser.id,
+    user_name: currentUser.name,
+    user_email: currentUser.email,
     items: [...cart],
     total,
-    date: new Date().toLocaleDateString('es-BO'),
     status: 'pendiente'
   };
-  orders.push(order);
-  LS.set('orders', orders);
-  cart.forEach(ci=>{ const p=products.find(x=>x.id===ci.id); if(p){p.sold=(p.sold||0)+ci.qty; p.stock=Math.max(0,p.stock-ci.qty);} });
-  LS.set('products', products);
+  const { error } = await sb.from('pedidos').insert(order);
+  if(error){ showToast('Error al guardar el pedido'); console.error(error); return; }
+  orders.push({...order, userId:currentUser.email, userName:currentUser.name, date:new Date().toLocaleDateString('es-BO')});
+  for(const ci of cart){
+    const p = products.find(x=>x.id===ci.id);
+    if(p){
+      p.sold=(p.sold||0)+ci.qty; p.stock=Math.max(0,p.stock-ci.qty);
+      await sb.from('productos').update({ sold:p.sold, stock:p.stock }).eq('id', p.id);
+    }
+  }
   cart=[];
   updateCartBadge();
   renderProds();
@@ -1032,11 +1082,18 @@ function checkout(){
 }
 
 // ===== WISHLIST =====
-function toggleWish(id){
+async function toggleWish(id){
+  if(!currentUser){ showToast('Inicia sesión para guardar favoritos'); openModal('authModal'); return; }
   const idx = wishlist.indexOf(id);
-  if(idx>-1){ wishlist.splice(idx,1); showToast('Eliminado de favoritos'); }
-  else { wishlist.push(id); showToast('❤️ Agregado a favoritos'); }
-  LS.set('wishlist', wishlist);
+  if(idx>-1){
+    wishlist.splice(idx,1);
+    await sb.from('favoritos').delete().eq('user_id', currentUser.id).eq('product_id', id);
+    showToast('Eliminado de favoritos');
+  } else {
+    wishlist.push(id);
+    await sb.from('favoritos').insert({ user_id: currentUser.id, product_id: id });
+    showToast('❤️ Agregado a favoritos');
+  }
   renderProds(); renderSale();
   if(currentProd && currentProd.id===id) document.getElementById('pdWishBtn').textContent = wishlist.includes(id)?'❤️':'🤍';
 }
@@ -1060,16 +1117,21 @@ function openUserModal(){ if(currentUser){ renderProfile(); openModal('profileMo
 function showRegister(){ document.getElementById('loginForm').style.display='none'; document.getElementById('registerForm').style.display=''; document.getElementById('authTitle').textContent='👤 Crear cuenta'; document.getElementById('authAlert').innerHTML=''; }
 function showLogin(){ document.getElementById('loginForm').style.display=''; document.getElementById('registerForm').style.display='none'; document.getElementById('authTitle').textContent='👤 Iniciar sesión'; document.getElementById('authAlert').innerHTML=''; }
 
-function doLogin(){
+async function doLogin(){
   const email = document.getElementById('loginEmail').value.trim();
   const pass = document.getElementById('loginPass').value;
-  const user = users.find(u=>u.email===email && u.pass===pass);
-  if(!user){ document.getElementById('authAlert').innerHTML='<div class="alert alert-error">Email o contraseña incorrectos</div>'; return; }
-  currentUser=user; LS.set('currentUser',user);
-  closeModal('authModal'); showToast(`¡Bienvenido ${user.name}!`);
+  if(!email||!pass){ document.getElementById('authAlert').innerHTML='<div class="alert alert-error">Completa todos los campos</div>'; return; }
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+  if(error){ document.getElementById('authAlert').innerHTML='<div class="alert alert-error">Email o contraseña incorrectos</div>'; return; }
+  const uid = data.user.id;
+  const { data: profile } = await sb.from('usuarios').select('*').eq('id', uid).single();
+  currentUser = { id:uid, name:profile.name, email:profile.email, phone:profile.phone, role:profile.role||'user' };
+  await loadWishlist();
+  closeModal('authModal'); showToast(`¡Bienvenido ${currentUser.name}!`);
+  renderProds(); renderSale();
 }
 
-function doRegister(){
+async function doRegister(){
   const name=document.getElementById('regName').value.trim();
   const last=document.getElementById('regLast').value.trim();
   const email=document.getElementById('regEmail').value.trim();
@@ -1077,25 +1139,36 @@ function doRegister(){
   const pass=document.getElementById('regPass').value;
   if(!name||!email||!pass){ document.getElementById('authAlert').innerHTML='<div class="alert alert-error">Completa todos los campos</div>'; return; }
   if(pass.length<6){ document.getElementById('authAlert').innerHTML='<div class="alert alert-error">La contraseña debe tener mínimo 6 caracteres</div>'; return; }
-  if(users.find(u=>u.email===email)){ document.getElementById('authAlert').innerHTML='<div class="alert alert-error">Este email ya está registrado</div>'; return; }
-  const user={name:`${name} ${last}`.trim(),email,phone,pass,role:'user',joined:new Date().toLocaleDateString('es-BO')};
-  users.push(user); LS.set('users',users);
-  currentUser=user; LS.set('currentUser',user);
+  const fullName = `${name} ${last}`.trim();
+  const { data, error } = await sb.auth.signUp({ email, password: pass });
+  if(error){ document.getElementById('authAlert').innerHTML=`<div class="alert alert-error">${error.message.includes('registered')?'Este email ya está registrado':'Error al crear la cuenta'}</div>`; return; }
+  const uid = data.user.id;
+  const { error: profErr } = await sb.from('usuarios').insert({ id:uid, name:fullName, email, phone, role:'user' });
+  if(profErr){ console.error(profErr); }
+  currentUser = { id:uid, name:fullName, email, phone, role:'user' };
+  wishlist=[];
   closeModal('authModal'); showToast(`✓ ¡Cuenta creada! Bienvenido ${name}`);
 }
 
-function doLogout(){ currentUser=null; LS.set('currentUser',null); closeModal('profileModal'); showToast('Sesión cerrada'); }
+async function doLogout(){
+  await sb.auth.signOut();
+  currentUser=null; wishlist=[];
+  closeModal('profileModal'); showToast('Sesión cerrada');
+  renderProds(); renderSale();
+}
 
-function renderProfile(){
+async function renderProfile(){
   if(!currentUser) return;
   document.getElementById('profileName').textContent = currentUser.name;
   document.getElementById('profileEmail').textContent = currentUser.email;
   document.getElementById('profileAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
-  const userOrders = orders.filter(o=>o.userId===currentUser.email);
+  const { data, error } = await sb.from('pedidos').select('*').eq('user_id', currentUser.id).order('created_at',{ascending:false});
+  const userOrders = error ? [] : (data||[]).map(o=>({...o, date:new Date(o.created_at).toLocaleDateString('es-BO')}));
   const od = document.getElementById('userOrders');
   if(!userOrders.length){ od.innerHTML='<p style="color:var(--muted);font-size:13px">Aún no tienes pedidos</p>'; return; }
   od.innerHTML = userOrders.map(o=>`
     <div class="order-card">
+
       <div class="order-header"><span class="order-id">${o.id}</span><span class="order-date">${o.date}</span></div>
       <div class="order-items">${o.items.map(i=>`${i.name} x${i.qty}${i.size?' ('+i.size+')':''}`).join(', ')}</div>
       <div style="display:flex;justify-content:space-between;align-items:center">
@@ -1108,42 +1181,54 @@ function renderProfile(){
 // ===== ADMIN =====
 function openAdminLogin(){ openModal('adminLoginModal'); }
 
-function doAdminLogin(){
+async function doAdminLogin(){
   const pass = document.getElementById('adminPass').value;
   if(pass !== config.adminPass){ document.getElementById('adminLoginAlert').innerHTML='<div class="alert alert-error">Contraseña incorrecta</div>'; return; }
   closeModal('adminLoginModal');
   document.getElementById('adminPanel').classList.add('open');
-  refreshAdmin();
+  await refreshAdmin();
 }
 
 function doAdminLogout(){ document.getElementById('adminPanel').classList.remove('open'); }
 function exitAdmin(){ document.getElementById('adminPanel').classList.remove('open'); }
 
-function switchAdminTab(el, tabId){
+async function switchAdminTab(el, tabId){
   document.querySelectorAll('.atab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.admin-section').forEach(s=>s.classList.remove('active'));
   el.classList.add('active');
   document.getElementById(tabId).classList.add('active');
-  if(tabId==='tabDash') renderDash();
+  if(tabId==='tabDash') await renderDash();
   if(tabId==='tabProds') renderAdminProds();
-  if(tabId==='tabOrders') renderAllOrders();
-  if(tabId==='tabUsers') renderUsers();
+  if(tabId==='tabOrders') await renderAllOrders();
+  if(tabId==='tabUsers') await renderUsers();
 }
 
-function refreshAdmin(){ renderDash(); renderAdminProds(); }
+async function loadOrders(){
+  const { data, error } = await sb.from('pedidos').select('*').order('created_at',{ascending:false});
+  orders = error ? [] : (data||[]).map(o=>({...o, date:new Date(o.created_at).toLocaleDateString('es-BO'), userId:o.user_email, userName:o.user_name}));
+}
 
-function renderDash(){
-  const totalSold = orders.reduce((a,o)=>a+o.items.reduce((b,i)=>b+i.qty,0),0);
-  const totalRev = orders.reduce((a,o)=>a+o.total,0);
+async function loadUsers(){
+  const { data, error } = await sb.from('usuarios').select('*');
+  users = error ? [] : (data||[]);
+}
+
+async function refreshAdmin(){ await loadOrders(); await renderDash(); renderAdminProds(); }
+
+async function renderDash(){
+  await loadOrders();
+  const totalSold = orders.reduce((a,o)=>a+(o.items||[]).reduce((b,i)=>b+i.qty,0),0);
+  const totalRev = orders.reduce((a,o)=>a+Number(o.total),0);
+  const { count: userCount } = await sb.from('usuarios').select('*',{count:'exact',head:true});
   document.getElementById('statVentas').textContent = totalSold;
   document.getElementById('statIngresos').textContent = 'Bs.'+totalRev;
   document.getElementById('statProductos').textContent = products.length;
-  document.getElementById('statUsuarios').textContent = users.length;
-  const recent = [...orders].reverse().slice(0,5);
+  document.getElementById('statUsuarios').textContent = userCount||0;
+  const recent = orders.slice(0,5);
   document.getElementById('dashOrders').innerHTML = recent.length ? recent.map(o=>`
     <div class="order-card">
       <div class="order-header"><span class="order-id">${o.id}</span><span class="order-date">${o.date}</span></div>
-      <div class="order-items"><strong>${o.userName}</strong> — ${o.items.map(i=>`${i.name} x${i.qty}`).join(', ')}</div>
+      <div class="order-items"><strong>${o.userName}</strong> — ${(o.items||[]).map(i=>`${i.name} x${i.qty}`).join(', ')}</div>
       <div style="display:flex;justify-content:space-between;align-items:center">
         <span class="order-total">Bs. ${o.total}</span>
         <select style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:3px 8px;font-size:11px" onchange="updateOrderStatus('${o.id}',this.value)">
@@ -1154,7 +1239,12 @@ function renderDash(){
     </div>`).join('') : '<p style="color:var(--muted);font-size:13px">No hay pedidos aún</p>';
 }
 
-function updateOrderStatus(id, status){ const o=orders.find(x=>x.id===id); if(o){ o.status=status; LS.set('orders',orders); renderDash(); renderAllOrders(); } }
+async function updateOrderStatus(id, status){
+  const { error } = await sb.from('pedidos').update({status}).eq('id', id);
+  if(error){ showToast('Error al actualizar'); return; }
+  const o=orders.find(x=>x.id===id); if(o) o.status=status;
+  await renderDash(); await renderAllOrders();
+}
 
 function renderAdminProds(){
   document.getElementById('adminProdBody').innerHTML = products.map(p=>`
@@ -1174,14 +1264,15 @@ function renderAdminProds(){
     </tr>`).join('');
 }
 
-function renderAllOrders(){
+async function renderAllOrders(){
+  await loadOrders();
   const od = document.getElementById('allOrders');
   if(!orders.length){ od.innerHTML='<p style="color:var(--muted);font-size:13px">No hay pedidos aún</p>'; return; }
-  od.innerHTML = [...orders].reverse().map(o=>`
+  od.innerHTML = orders.map(o=>`
     <div class="order-card">
       <div class="order-header"><span class="order-id">${o.id}</span><span class="order-date">${o.date}</span></div>
       <div style="font-size:12px;color:var(--muted);margin-bottom:4px"><strong style="color:var(--text)">${o.userName}</strong> (${o.userId})</div>
-      <div class="order-items">${o.items.map(i=>`${i.name} x${i.qty}${i.size?' ('+i.size+')':''} — Bs.${i.price*i.qty}`).join(' | ')}</div>
+      <div class="order-items">${(o.items||[]).map(i=>`${i.name} x${i.qty}${i.size?' ('+i.size+')':''} — Bs.${i.price*i.qty}`).join(' | ')}</div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
         <span class="order-total">Total: Bs. ${o.total}</span>
         <select style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:3px 8px;font-size:11px" onchange="updateOrderStatus('${o.id}',this.value)">
@@ -1192,7 +1283,8 @@ function renderAllOrders(){
     </div>`).join('');
 }
 
-function renderUsers(){
+async function renderUsers(){
+  await loadUsers(); await loadOrders();
   document.getElementById('usersBody').innerHTML = users.length ? users.map(u=>`
     <tr>
       <td><strong>${u.name}</strong></td>
@@ -1241,12 +1333,12 @@ function editProd(id){
   openModal('prodFormModal');
 }
 
-function saveProd(){
+async function saveProd(){
   const name=document.getElementById('pfName').value.trim();
   const price=parseFloat(document.getElementById('pfPrice').value);
   if(!name||isNaN(price)){ showToast('Completa nombre y precio'); return; }
   const id=document.getElementById('pfId').value;
-  const data={
+  const p={
     name, cat:document.getElementById('pfCat').value,
     price, old:parseFloat(document.getElementById('pfOld').value)||0,
     sizes:document.getElementById('pfSizes').value.trim(),
@@ -1256,23 +1348,26 @@ function saveProd(){
     img:document.getElementById('pfImgData').value||'',
     sale:document.getElementById('pfSale').checked,
   };
+  const dbRow = mapProductToDB(p);
   if(id){
-    const idx=products.findIndex(x=>x.id==id);
-    if(idx>-1){ products[idx]={...products[idx],...data}; }
+    const { error } = await sb.from('productos').update(dbRow).eq('id', id);
+    if(error){ showToast('Error al guardar'); console.error(error); return; }
   } else {
-    data.id=nextId++; data.sold=0;
-    products.push(data);
+    dbRow.sold = 0;
+    const { error } = await sb.from('productos').insert(dbRow);
+    if(error){ showToast('Error al guardar'); console.error(error); return; }
   }
-  LS.set('products',products);
+  await loadProducts();
   closeModal('prodFormModal');
   renderProds(); renderSale(); renderAdminProds();
   showToast('✓ Producto guardado');
 }
 
-function deleteProd(id){
+async function deleteProd(id){
   if(!confirm('¿Eliminar este producto?')) return;
+  const { error } = await sb.from('productos').delete().eq('id', id);
+  if(error){ showToast('Error al eliminar'); return; }
   products=products.filter(p=>p.id!==id);
-  LS.set('products',products);
   renderProds(); renderSale(); renderAdminProds();
   showToast('Producto eliminado');
 }
@@ -1302,7 +1397,7 @@ function applyColor(varName, value){
   if(previewMap[key]) document.getElementById(previewMap[key]).textContent=value;
 }
 
-function saveColors(){
+async function saveColors(){
   const colors={
     primary:document.getElementById('colorPrimary').value,
     bg:document.getElementById('colorBg').value,
@@ -1311,19 +1406,22 @@ function saveColors(){
     text:document.getElementById('colorText').value,
     border:document.getElementById('colorBorder').value,
   };
-  config.colors=colors; LS.set('config',config);
+  config.colors=colors;
+  const { error } = await sb.from('configuracion').update({ colors }).eq('id',1);
+  if(error){ showToast('Error al guardar colores'); return; }
   showToast('✓ Colores guardados');
 }
 
-function resetColors(){
+async function resetColors(){
   const def={primary:'#D4E600',bg:'#0D0D0D',bg2:'#1A1A1A',card:'#181818',text:'#F0F0F0',border:'#2A2A2A'};
   Object.entries(def).forEach(([k,v])=>{ document.documentElement.style.setProperty('--'+k,v); const el=document.getElementById('color'+k.charAt(0).toUpperCase()+k.slice(1)); if(el) el.value=v; });
-  config.colors=def; LS.set('config',config);
+  config.colors=def;
+  await sb.from('configuracion').update({ colors:def }).eq('id',1);
   showToast('Colores restaurados');
 }
 
 // ===== CONFIG =====
-function saveConfig(){
+async function saveConfig(){
   config.name=document.getElementById('cfgName').value.trim()||'KUSTOM';
   config.city=document.getElementById('cfgCity').value.trim();
   config.hero=document.getElementById('cfgHero').value.trim();
@@ -1333,7 +1431,11 @@ function saveConfig(){
   config.hours=document.getElementById('cfgHours').value.trim();
   const newPass=document.getElementById('cfgNewPass').value;
   if(newPass.length>=4) config.adminPass=newPass;
-  LS.set('config',config);
+  const { error } = await sb.from('configuracion').update({
+    name:config.name, city:config.city, hero:config.hero, wa:config.wa,
+    ig:config.ig, addr:config.addr, hours:config.hours, admin_pass:config.adminPass
+  }).eq('id',1);
+  if(error){ showToast('Error al guardar configuración'); return; }
   applyConfig();
   showToast('✓ Configuración guardada');
 }
@@ -1369,7 +1471,6 @@ setInterval(()=>{
 
 // ===== START =====
 init();
-renderSale();
 </script>
 </body>
 </html>
