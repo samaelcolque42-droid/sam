@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KUSTOM — Ropa & Calzado · La Paz</title>
+<title>KUSTOM — Tenis & Calzado · La Paz</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -59,8 +59,8 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
 .sec-title .accent{color:var(--primary)}
 
 /* ===== CATEGORIES ===== */
-.cat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
-.cat-card{background:var(--bg3);border:1px solid var(--border);padding-bottom:90%;position:relative;cursor:pointer;transition:border-color .2s}
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,160px));gap:12px}
+.cat-card{background:var(--bg3);border:1px solid var(--border);height:160px;position:relative;cursor:pointer;transition:border-color .2s;overflow:hidden}
 .cat-card:hover{border-color:var(--primary)}
 .cat-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
 .cat-img{width:60px;height:60px;object-fit:cover;border-radius:4px}
@@ -268,6 +268,16 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
 .profile-info h2{font-size:16px;font-weight:700;color:var(--text)}
 .profile-info p{font-size:12px;color:var(--muted)}
 
+/* ===== PAYMENT ===== */
+.payment-opt{display:flex;align-items:center;gap:12px;padding:14px;background:var(--bg3);border:1px solid var(--border);cursor:pointer;transition:all .2s}
+.payment-opt:hover{border-color:var(--primary)}
+.payment-opt.selected{border-color:var(--primary);background:#1A1E00}
+.pay-icon-big{font-size:24px;flex-shrink:0}
+.pay-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px}
+.pay-sub{font-size:11px;color:var(--muted)}
+.pay-check{margin-left:auto;font-size:18px;color:var(--muted)}
+.payment-opt.selected .pay-check{color:var(--primary)}
+
 @media(max-width:600px){
   .nav-links{display:none}
   .hero h1{font-size:30px}
@@ -287,9 +297,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
 <div id="storePage">
 
 <div class="topbar">
-  <span>🚚 Envío gratis en compras +Bs.500</span>
-  <span>🔄 Cambios y devoluciones fáciles</span>
-  <span>💵 Paga en efectivo o transferencia</span>
+  <span>⚡ Nueva colección <span id="storeYear">2026</span> — Tenis y calzado urbano</span>
 </div>
 
 <nav class="nav">
@@ -304,7 +312,6 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
   <div class="nav-icons">
     <button onclick="openModal('searchModal')" title="Buscar">🔍</button>
     <button onclick="openUserModal()" title="Mi cuenta">👤</button>
-    <button onclick="openModal('wishModal')" title="Favoritos">🤍</button>
     <div class="cart-wrap">
       <button onclick="openModal('cartModal')" title="Carrito">🛍️</button>
       <span class="cbadge" id="cartCount">0</span>
@@ -316,7 +323,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
 <section class="hero">
   <div class="hero-glow"></div>
   <div class="hero-content">
-    <div class="hero-tag">⚡ Nueva colección 2025</div>
+    <div class="hero-tag">⚡ Nueva colección <span id="storeYear2">2026</span></div>
     <h1>TU ESTILO<br><em>TE DEFINE</em></h1>
     <p id="heroSubtitle">Ropa y calzado para jóvenes que marcan tendencia.<br>Streetwear auténtico hecho para La Paz.</p>
     <div class="hero-btns">
@@ -342,10 +349,6 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
   <div class="sec-title"><span class="accent">▸</span> Productos destacados</div>
   <div class="tabs-row" id="filterTabs">
     <button class="ptab active" onclick="filterProds(this,'todos')">Todos</button>
-    <button class="ptab" onclick="filterProds(this,'hombre')">Hombre</button>
-    <button class="ptab" onclick="filterProds(this,'mujer')">Mujer</button>
-    <button class="ptab" onclick="filterProds(this,'calzado')">Calzado</button>
-    <button class="ptab" onclick="filterProds(this,'accesorios')">Accesorios</button>
   </div>
   <div class="prod-grid" id="prodGrid"></div>
   <div class="view-all"><button onclick="filterProds(document.querySelector('.ptab'),'todos')">Ver todos los productos</button></div>
@@ -371,12 +374,12 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
 <!-- PROMO BANNERS -->
 <div class="promo-grid">
   <div class="promo-card y">
-    <div><div class="promo-tag">Colección</div><h3>ROPA<br>URBANA</h3></div>
-    <button class="promo-btn" onclick="filterProds(document.querySelectorAll('.ptab')[1],'hombre')">▶ Comprar ahora</button>
+    <div><div class="promo-tag">Colección</div><h3>TENIS<br>CASUALES</h3></div>
+    <button class="promo-btn" onclick="filterProds(document.querySelectorAll('.ptab')[0],'todos')">▶ Ver colección</button>
   </div>
   <div class="promo-card">
-    <div><div class="promo-tag">Colección</div><h3>LOOKS<br>CASUALES</h3></div>
-    <button class="promo-btn" onclick="filterProds(document.querySelectorAll('.ptab')[2],'mujer')">▶ Descubrir</button>
+    <div><div class="promo-tag">Colección</div><h3>TENIS<br>DEPORTIVOS</h3></div>
+    <button class="promo-btn" onclick="scrollToId('offerSection')">▶ Ver ofertas</button>
   </div>
 </div>
 
@@ -417,8 +420,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
 
 <!-- FOOTER INFO -->
 <div class="footer-info">
-  <div class="fi-item"><span class="fi-icon">🚚</span><div><div class="fi-title">Envío gratis</div><div class="fi-sub">En compras +Bs.500</div></div></div>
-  <div class="fi-item"><span class="fi-icon">🔄</span><div><div class="fi-title">Cambios fáciles</div><div class="fi-sub">30 días para cambios</div></div></div>
+  <div class="fi-item"><span class="fi-icon">🔄</span><div><div class="fi-title">Cambios fáciles</div><div class="fi-sub">15 días para cambios</div></div></div>
   <div class="fi-item"><span class="fi-icon">🔒</span><div><div class="fi-title">Compra segura</div><div class="fi-sub">Tus datos protegidos</div></div></div>
   <div class="fi-item"><span class="fi-icon">🎧</span><div><div class="fi-title">Atención 24/7</div><div class="fi-sub">Siempre para ayudarte</div></div></div>
 </div>
@@ -436,7 +438,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
   </div>
   <div class="footer-col">
     <h4>Categorías</h4>
-    <a>Hombre</a><a>Mujer</a><a>Calzado</a><a>Accesorios</a><a>Novedades</a><a>Ofertas</a>
+    <a>Tenis Casual</a><a>Tenis Deportivo</a><a>Botas</a><a>Novedades</a><a>Ofertas</a>
   </div>
   <div class="footer-col">
     <h4>Información</h4>
@@ -445,7 +447,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
   </div>
 </div>
 <div class="footer-bottom">
-  <p>© 2025 Kustom. Todos los derechos reservados · La Paz, Bolivia</p>
+  <p>© <span id="storeYear3">2026</span> Kustom. Todos los derechos reservados · La Paz, Bolivia</p>
   <div class="pay-icons">
     <span class="pay-icon">VISA</span><span class="pay-icon">MC</span>
     <span class="pay-icon">QR</span><span class="pay-icon">EFECTIVO</span>
@@ -466,20 +468,63 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
     <div class="modal-body">
       <div id="cartItems"></div>
       <div class="cart-total"><span>Total:</span><span id="cartTotal">Bs. 0</span></div>
-      <button class="btn-full" onclick="checkout()">✓ Finalizar compra</button>
+      <button class="btn-full" onclick="openPayment()">✓ Finalizar compra</button>
     </div>
   </div>
 </div>
 
-<!-- WISH -->
-<div class="overlay" id="wishModal">
-  <div class="modal">
+<!-- PAYMENT -->
+<div class="overlay" id="paymentModal">
+  <div class="modal" style="max-width:420px">
     <div class="modal-header">
-      <h2>🤍 Favoritos</h2>
-      <button class="modal-close" onclick="closeModal('wishModal')">✕</button>
+      <h2>💳 Método de pago</h2>
+      <button class="modal-close" onclick="closeModal('paymentModal')">✕</button>
     </div>
     <div class="modal-body">
-      <div id="wishItems"></div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Elige cómo quieres pagar tu pedido:</p>
+      <div id="paymentOptions" style="display:flex;flex-direction:column;gap:10px">
+        <div class="payment-opt" onclick="selectPayment(this,'QR – Transferencia bancaria')" data-method="QR – Transferencia bancaria">
+          <span class="pay-icon-big">📱</span>
+          <div>
+            <div class="pay-name">QR – Transferencia bancaria</div>
+            <div class="pay-sub">Escanea el QR y paga el total al instante</div>
+          </div>
+          <span class="pay-check">○</span>
+        </div>
+        <div class="payment-opt" onclick="selectPayment(this,'Contra entrega – 50% anticipo')" data-method="Contra entrega – 50% anticipo">
+          <span class="pay-icon-big">🚚</span>
+          <div>
+            <div class="pay-name">Pago contra entrega</div>
+            <div class="pay-sub">50% anticipo por QR + 50% al recibir</div>
+          </div>
+          <span class="pay-check">○</span>
+        </div>
+      </div>
+      <div id="qrInfo" style="display:none;margin-top:12px;background:var(--bg3);border:1px solid var(--border);padding:14px;text-align:center">
+        <p style="font-size:12px;font-weight:700;color:var(--primary);margin-bottom:6px">📱 Escanea para pagar</p>
+        <p style="font-size:11px;color:var(--muted)">Número de cuenta: <strong style="color:var(--text)">+591 7XX XXXX</strong></p>
+        <p style="font-size:11px;color:var(--muted);margin-top:4px">Banco: <strong style="color:var(--text)">BNB / Tigo Money</strong></p>
+        <p style="font-size:11px;color:var(--muted);margin-top:4px">Envía el comprobante por WhatsApp al confirmar</p>
+      </div>
+      <div id="depositInfo" style="display:none;margin-top:12px;background:#1A2E00;border:1px solid #3A5A00;padding:14px">
+        <p style="font-size:12px;font-weight:700;color:#A8D400;margin-bottom:6px">⚠ Anticipo requerido</p>
+        <p style="font-size:12px;color:var(--muted)">Debes pagar el <strong style="color:var(--text)">50% por QR</strong> para confirmar tu pedido.</p>
+        <p style="font-size:12px;color:var(--muted);margin-top:4px">El restante 50% lo pagas cuando recibes tu pedido.</p>
+        <p style="font-size:11px;color:var(--muted);margin-top:6px">Número: <strong style="color:var(--text)">+591 7XX XXXX</strong></p>
+      </div>
+      <div class="form-group" style="margin-top:16px">
+        <label>Dirección de entrega</label>
+        <input type="text" id="deliveryAddr" placeholder="Ej: Av. 6 de Agosto, La Paz">
+      </div>
+      <div class="form-group">
+        <label>Teléfono de contacto</label>
+        <input type="text" id="deliveryPhone" placeholder="Ej: +591 7XX XXXX">
+      </div>
+      <div class="form-group">
+        <label>Nota para el pedido (opcional)</label>
+        <textarea id="deliveryNote" placeholder="Ej: Talla 42, color negro..."></textarea>
+      </div>
+      <button class="btn-full" onclick="checkout()" id="btnConfirmPay" style="opacity:.4;pointer-events:none">Confirmar pedido</button>
     </div>
   </div>
 </div>
@@ -570,10 +615,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
         <div class="size-selector" id="pdSizes"></div>
       </div>
       <p style="font-size:12px;color:var(--muted);margin:8px 0 14px;line-height:1.6" id="pdDesc"></p>
-      <div style="display:flex;gap:8px">
-        <button class="btn-full" onclick="addToCartFromDetail()" style="flex:1">🛒 Agregar al carrito</button>
-        <button style="padding:11px 14px;background:transparent;border:1px solid var(--border);color:var(--muted);cursor:pointer;font-size:16px" onclick="toggleWish(currentProd.id)" id="pdWishBtn">🤍</button>
-      </div>
+      <button class="btn-full" onclick="addToCartFromDetail()">🛒 Agregar al carrito</button>
     </div>
   </div>
 </div>
@@ -609,6 +651,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
     <button class="atab" onclick="switchAdminTab(this,'tabProds')">👕 Productos</button>
     <button class="atab" onclick="switchAdminTab(this,'tabOrders')">📦 Pedidos</button>
     <button class="atab" onclick="switchAdminTab(this,'tabUsers')">👥 Usuarios</button>
+    <button class="atab" onclick="switchAdminTab(this,'tabMarcas')">🏷️ Marcas</button>
     <button class="atab" onclick="switchAdminTab(this,'tabDesign')">🎨 Diseño</button>
     <button class="atab" onclick="switchAdminTab(this,'tabConfig')">⚙ Config</button>
   </div>
@@ -636,9 +679,9 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
       <div style="overflow-x:auto">
         <table class="prod-table" id="adminProdTable">
           <thead><tr>
-            <th>Imagen</th><th>Nombre</th><th>Categoría</th>
-            <th>Precio</th><th>Precio anterior</th><th>Tallas</th>
-            <th>Stock</th><th>Ventas</th><th>Acciones</th>
+            <th>Imagen</th><th>Nombre</th><th>Marca</th>
+            <th>Precio</th><th>Precio anterior</th><th>Tallas/Stock</th>
+            <th>Ventas</th><th>Acciones</th>
           </tr></thead>
           <tbody id="adminProdBody"></tbody>
         </table>
@@ -660,6 +703,13 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
           <tbody id="usersBody"></tbody>
         </table>
       </div>
+    </div>
+
+    <!-- MARCAS -->
+    <div class="admin-section" id="tabMarcas">
+      <h3 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px">Gestión de marcas</h3>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:16px">Las marcas se crean automáticamente cuando agregas un producto. Aquí puedes subir el logo/imagen de cada marca.</p>
+      <div id="marcasAdmin"></div>
     </div>
 
     <!-- DISEÑO -->
@@ -717,6 +767,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
     <!-- CONFIG -->
     <div class="admin-section" id="tabConfig">
       <h3 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:14px">Configuración de la tienda</h3>
+      <div class="form-group"><label>Año de colección</label><input type="text" id="cfgYear" value="2026" placeholder="Ej: 2026"></div>
       <div class="form-group"><label>Nombre de la tienda</label><input type="text" id="cfgName" value="KUSTOM"></div>
       <div class="form-group"><label>Ciudad / Subtítulo</label><input type="text" id="cfgCity" value="La Paz · Bolivia"></div>
       <div class="form-group"><label>Subtítulo del hero</label><input type="text" id="cfgHero" value="Ropa y calzado para jóvenes que marcan tendencia."></div>
@@ -748,10 +799,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
         <div class="form-group"><label>Nombre del producto</label><input type="text" id="pfName" placeholder="Ej: Hoodie Oversized"></div>
         <div class="form-group"><label>Categoría</label>
           <select id="pfCat">
-            <option value="hombre">Hombre</option>
-            <option value="mujer">Mujer</option>
             <option value="calzado">Calzado</option>
-            <option value="accesorios">Accesorios</option>
           </select>
         </div>
       </div>
@@ -759,8 +807,13 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
         <div class="form-group"><label>Precio (Bs.)</label><input type="number" id="pfPrice" placeholder="180"></div>
         <div class="form-group"><label>Precio anterior (opcional)</label><input type="number" id="pfOld" placeholder="220"></div>
       </div>
-      <div class="form-group"><label>Tallas disponibles (separadas por coma)</label><input type="text" id="pfSizes" placeholder="S, M, L, XL o 38, 40, 42"></div>
-      <div class="form-group"><label>Stock disponible</label><input type="number" id="pfStock" placeholder="10" value="10"></div>
+      <div class="form-group"><label>Marca</label><input type="text" id="pfMarca" placeholder="Ej: Nike, Adidas, Puma..."></div>
+      <div class="form-group">
+        <label>Tallas y cantidad disponible</label>
+        <div id="tallasContainer" style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px"></div>
+        <button type="button" onclick="addTallaRow()" style="background:transparent;border:1px dashed var(--border);color:var(--primary);padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;width:100%">+ Agregar talla</button>
+        <p class="form-hint">Agrega cada talla con su cantidad. Ej: Talla 41 → 5 unidades</p>
+      </div>
       <div class="form-group"><label>Descripción</label><textarea id="pfDesc" placeholder="Descripción del producto..."></textarea></div>
       <div class="form-group"><label>Imagen del producto</label>
         <div class="img-upload-area" onclick="document.getElementById('pfImgInput').click()">
@@ -817,13 +870,20 @@ let selectedSize = '';
 // Map DB row (descripcion) <-> app field (desc)
 function mapProductFromDB(row){
   return { id:row.id, name:row.name, cat:row.cat, price:Number(row.price), old:Number(row.old)||0,
-    sizes:row.sizes||'', stock:row.stock||0, desc:row.descripcion||'', emoji:row.emoji||'👕',
-    img:row.img||'', sale:!!row.sale, sold:row.sold||0 };
+    sizes:row.sizes||'', stock:row.stock||0, desc:row.descripcion||'', emoji:row.emoji||'👟',
+    img:row.img||'', sale:!!row.sale, sold:row.sold||0,
+    marca:row.marca||'', tallasStock:row.tallas_stock||[] };
 }
 function mapProductToDB(p){
-  return { name:p.name, cat:p.cat, price:p.price, old:p.old||0, sizes:p.sizes||'',
-    stock:p.stock||0, descripcion:p.desc||'', emoji:p.emoji||'👕', img:p.img||'',
-    sale:!!p.sale, sold:p.sold||0 };
+  // Calcular stock total desde tallas
+  const totalStock = p.tallasStock && p.tallasStock.length
+    ? p.tallasStock.reduce((a,t)=>a+Number(t.qty||0),0)
+    : (p.stock||0);
+  return { name:p.name, cat:'calzado', price:p.price, old:p.old||0,
+    sizes: p.tallasStock && p.tallasStock.length ? p.tallasStock.map(t=>t.talla).join(',') : (p.sizes||''),
+    stock:totalStock, descripcion:p.desc||'', emoji:p.emoji||'👟', img:p.img||'',
+    sale:!!p.sale, sold:p.sold||0, marca:p.marca||'',
+    tallas_stock: p.tallasStock||[] };
 }
 
 // ===== INIT =====
@@ -833,6 +893,7 @@ async function init(){
   applyStoredColors();
   await checkSession();
   await loadProducts();
+  await loadMarcas();
   renderCats();
   renderProds();
   renderSale();
@@ -846,6 +907,7 @@ async function loadConfig(){
   config = {
     name:data.name, city:data.city, hero:data.hero, wa:data.wa, ig:data.ig,
     addr:data.addr, hours:data.hours, adminPass:data.admin_pass,
+    year: (data.colors||{}).year || '2026',
     colors: data.colors || defaultConfig.colors
   };
 }
@@ -883,6 +945,10 @@ function applyConfig(){
   if(document.getElementById('igHandle')) document.getElementById('igHandle').textContent=c.ig;
   if(document.getElementById('storeAddress')) document.getElementById('storeAddress').textContent=c.addr;
   if(document.getElementById('storeHours')) document.getElementById('storeHours').textContent=c.hours;
+  if(document.getElementById('storeYear')) document.getElementById('storeYear').textContent=c.year||'2026';
+  if(document.getElementById('storeYear2')) document.getElementById('storeYear2').textContent=c.year||'2026';
+  if(document.getElementById('storeYear3')) document.getElementById('storeYear3').textContent=c.year||'2026';
+  if(document.getElementById('cfgYear')) document.getElementById('cfgYear').value=c.year||'2026';
   if(document.getElementById('cfgName')) document.getElementById('cfgName').value=c.name;
   if(document.getElementById('cfgCity')) document.getElementById('cfgCity').value=c.city;
   if(document.getElementById('cfgHero')) document.getElementById('cfgHero').value=c.hero;
@@ -903,22 +969,44 @@ function applyStoredColors(){
 }
 
 // ===== RENDER =====
-function renderCats(){
-  const cats = [{label:'Hombre',emoji:'🧔',cat:'hombre'},{label:'Mujer',emoji:'👩',cat:'mujer'},{label:'Calzado',emoji:'👟',cat:'calzado'},{label:'Accesorios',emoji:'🎒',cat:'accesorios'}];
-  document.getElementById('catGrid').innerHTML = cats.map(c=>`
-    <div class="cat-card" onclick="scrollToId('newSection');filterProds(null,'${c.cat}')">
-      <div class="cat-inner">
-        <span class="cat-emoji">${c.emoji}</span>
-        <span class="cat-label">${c.label}</span>
-        <span class="cat-btn">▶ Ver todo</span>
-      </div>
-    </div>`).join('');
+let marcasDB = {};
+
+async function loadMarcas(){
+  const { data } = await sb.from('marcas').select('*');
+  marcasDB = {};
+  (data||[]).forEach(m=>{ marcasDB[m.nombre.toLowerCase()] = m.img; });
 }
+
+function renderCats(){
+  const marcas = [...new Set(products.map(p=>p.marca).filter(Boolean))];
+  document.getElementById('catGrid').innerHTML = marcas.length ? marcas.map(m=>{
+    const img = marcasDB[m.toLowerCase()]||'';
+    const inner = img
+      ? `<img src="${img}" alt="${m}" style="width:100%;height:100%;object-fit:contain;padding:14px;position:absolute;inset:0">
+         <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.6);padding:8px 0;text-align:center">
+           <span class="cat-label">${m}</span>
+         </div>
+         <div style="position:absolute;top:8px;right:8px">
+           <span class="cat-btn">▶ Ver</span>
+         </div>`
+      : `<span class="cat-emoji">👟</span>
+         <span class="cat-label">${m}</span>
+         <span class="cat-btn">▶ Ver todo</span>`;
+    return `<div class="cat-card" onclick="selectMarca('${m}')">
+      <div class="cat-inner">${inner}</div>
+    </div>`;
+  }).join('') :
+    `<p style="color:var(--muted);font-size:13px;padding:20px 0">Agrega productos con marca desde el panel admin.</p>`;
+  const tabs = document.getElementById('filterTabs');
+  tabs.innerHTML = `<button class="ptab active" onclick="filterProds(this,'todos')">Todos</button>` +
+    marcas.map(m=>`<button class="ptab" onclick="filterProds(this,'${m}')">${m}</button>`).join('');
+}
+
 
 function renderProds(list, containerId='prodGrid'){
   const grid = document.getElementById(containerId);
   if(!grid) return;
-  const prods = list || products.filter(p=>!p.sale);
+  const prods = list || products;
   if(!prods.length){ grid.innerHTML='<p style="color:var(--muted);font-size:13px;padding:20px 0">No hay productos en esta categoría.</p>'; return; }
   grid.innerHTML = prods.map(p=>prodCard(p)).join('');
 }
@@ -932,35 +1020,42 @@ function renderSale(){
 }
 
 function prodCard(p, isSale=false){
-  const pct = p.old && p.old>p.price ? `-${Math.round((1-p.price/p.old)*100)}%` : '';
-  const imgContent = p.img ? `<img src="${p.img}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover">` : `<span class="prod-emoji">${p.emoji||'👕'}</span>`;
+  const pct = p.old && p.old>p.price ? `-${Math.round((1-p.price/p.old)*100)}%` : "";
+  const imgContent = p.img ? `<img src="${p.img}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover">` : `<span class="prod-emoji">${p.emoji||"👟"}</span>`;
   const badge = isSale ? `<span class="prod-sale-badge">OFERTA ${pct}</span>` : `<span class="prod-new">NUEVO</span>`;
-  const wish = wishlist.includes(p.id) ? '❤️' : '🤍';
-  return `<div class="prod-card" data-cat="${p.cat}">
-    <div class="prod-img-wrap">
-      ${imgContent}
-      ${badge}
-      <button class="prod-wish ${wishlist.includes(p.id)?'active':''}" onclick="toggleWish(${p.id})">${wish}</button>
-    </div>
+  const addBtn = p.stock===0 ? `<button class="prod-add" disabled style="opacity:.4;cursor:not-allowed">Sin stock</button>` : `<button class="prod-add" onclick="event.stopPropagation();openProdDetail(${p.id})">🛒 Agregar</button>`;
+  return `<div class="prod-card" data-cat="${p.cat}" onclick="openProdDetail(${p.id})" style="cursor:pointer">
+    <div class="prod-img-wrap">${imgContent}${badge}</div>
     <div class="prod-info">
-      <div class="prod-cat">${p.cat}</div>
+      <div class="prod-cat">${p.marca||p.cat}</div>
       <div class="prod-name">${p.name}</div>
-      ${p.sizes ? `<div class="prod-sizes">${p.sizes.split(',').slice(0,4).map(s=>`<span class="size-tag">${s.trim()}</span>`).join('')}</div>` : ''}
-      <div class="prod-row">
-        <span class="prod-price">Bs. ${p.price}</span>
-        ${p.old && p.old>p.price ? `<span class="prod-old">Bs. ${p.old}</span><span class="prod-pct">${pct}</span>` : ''}
-      </div>
-      ${p.stock<=3 && p.stock>0 ? `<div class="prod-stock">⚠ Solo ${p.stock} disponibles</div>` : ''}
-      ${p.stock===0 ? `<div class="prod-stock">Sin stock</div>` : ''}
-      <button class="prod-add" onclick="openProdDetail(${p.id})">${p.stock===0?'Sin stock':'🛒 Agregar'}</button>
+      ${p.sizes ? `<div class="prod-sizes">${p.sizes.split(",").slice(0,4).map(s=>`<span class="size-tag">${s.trim()}</span>`).join("")}</div>` : ""}
+      <div class="prod-row"><span class="prod-price">Bs. ${p.price}</span>${p.old && p.old>p.price ? `<span class="prod-old">Bs. ${p.old}</span><span class="prod-pct">${pct}</span>` : ""}</div>
+      ${p.stock<=3 && p.stock>0 ? `<div class="prod-stock">⚠ Solo ${p.stock} disponibles</div>` : ""}
+      ${addBtn}
     </div>
   </div>`;
 }
 
-function filterProds(el, cat){
+function selectMarca(marca){
+  scrollToId('newSection');
+  // Activar el tab correcto
+  const tabs = document.querySelectorAll('.ptab');
+  tabs.forEach(t=>{
+    if(t.textContent===marca){ t.click(); }
+  });
+}
+
+function filterProds(el, marca){
   document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('active'));
   if(el) el.classList.add('active');
-  const prods = cat==='todos' ? products.filter(p=>!p.sale) : products.filter(p=>p.cat===cat&&!p.sale);
+  else {
+    const tab = [...document.querySelectorAll('.ptab')].find(t=>t.textContent===marca);
+    if(tab) tab.classList.add('active');
+  }
+  const prods = marca==='todos'
+    ? products
+    : products.filter(p=>p.marca && p.marca.toLowerCase()===marca.toLowerCase());
   renderProds(prods);
 }
 
@@ -970,21 +1065,27 @@ function openProdDetail(id){
   if(!p) return;
   currentProd = p; selectedSize='';
   document.getElementById('pdTitle').textContent = p.name;
-  document.getElementById('pdCat').textContent = p.cat;
+  document.getElementById('pdCat').textContent = p.marca ? `${p.marca} · ${p.cat}` : p.cat;
   document.getElementById('pdName').textContent = p.name;
   document.getElementById('pdPrice').textContent = `Bs. ${p.price}`;
   document.getElementById('pdOld').textContent = p.old && p.old>p.price ? `Bs. ${p.old}` : '';
   const pct = p.old && p.old>p.price ? `-${Math.round((1-p.price/p.old)*100)}%` : '';
   document.getElementById('pdPct').textContent = pct;
   document.getElementById('pdDesc').textContent = p.desc || '';
-  document.getElementById('pdWishBtn').textContent = wishlist.includes(p.id) ? '❤️' : '🤍';
   const imgWrap = document.getElementById('pdImgWrap');
-  imgWrap.innerHTML = p.img ? `<img src="${p.img}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover">` : `<span style="font-size:64px">${p.emoji||'👕'}</span>`;
-  const sizes = p.sizes ? p.sizes.split(',').map(s=>s.trim()).filter(Boolean) : [];
+  imgWrap.innerHTML = p.img ? `<img src="${p.img}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover">` : `<span style="font-size:64px">${p.emoji||'👟'}</span>`;
   const sw = document.getElementById('pdSizesWrap');
-  if(sizes.length){
+  const tallasStock = p.tallasStock && p.tallasStock.length ? p.tallasStock : [];
+  if(tallasStock.length){
     sw.style.display='';
-    document.getElementById('pdSizes').innerHTML = sizes.map(s=>`<button class="size-btn" onclick="selectSize(this,'${s}')">${s}</button>`).join('');
+    document.getElementById('pdSizes').innerHTML = tallasStock.map(t=>{
+      const qty = Number(t.qty||0);
+      const disabled = qty===0 ? 'class="size-btn unavailable" disabled title="Sin stock"' : `class="size-btn" onclick="selectSize(this,'${t.talla}')"`;
+      return `<button ${disabled}>${t.talla}${qty===0?' ✗':qty<=2?' ('+qty+')':''}</button>`;
+    }).join('');
+  } else if(p.sizes){
+    sw.style.display='';
+    document.getElementById('pdSizes').innerHTML = p.sizes.split(',').map(s=>`<button class="size-btn" onclick="selectSize(this,'${s.trim()}')">${s.trim()}</button>`).join('');
   } else { sw.style.display='none'; }
   openModal('prodModal');
 }
@@ -997,9 +1098,14 @@ function selectSize(btn, s){
 
 function addToCartFromDetail(){
   if(!currentProd) return;
-  const sizes = currentProd.sizes ? currentProd.sizes.split(',').map(s=>s.trim()).filter(Boolean) : [];
-  if(sizes.length && !selectedSize){ showToast('Selecciona una talla primero'); return; }
-  if(currentProd.stock===0){ showToast('Producto sin stock'); return; }
+  const tallasStock = currentProd.tallasStock && currentProd.tallasStock.length ? currentProd.tallasStock : [];
+  const hasSizes = tallasStock.length > 0 || currentProd.sizes;
+  if(hasSizes && !selectedSize){ showToast('Selecciona una talla primero'); return; }
+  if(selectedSize && tallasStock.length){
+    const t = tallasStock.find(x=>x.talla===selectedSize);
+    if(t && Number(t.qty)===0){ showToast('Esta talla no tiene stock'); return; }
+  }
+  if(currentProd.stock===0 && !tallasStock.length){ showToast('Producto sin stock'); return; }
   addToCart(currentProd.id, selectedSize);
   closeModal('prodModal');
 }
@@ -1050,9 +1156,54 @@ function changeQty(idx, d){
 
 function removeCartItem(idx){ cart.splice(idx,1); updateCartBadge(); renderCart(); }
 
-async function checkout(){
+let selectedPayment = '';
+
+function openPayment(){
   if(!cart.length){ showToast('Tu carrito está vacío'); return; }
   if(!currentUser){ closeModal('cartModal'); openModal('authModal'); showToast('Inicia sesión para continuar'); return; }
+  closeModal('cartModal');
+  selectedPayment='';
+  document.querySelectorAll('.payment-opt').forEach(o=>{ o.classList.remove('selected'); o.querySelector('.pay-check').textContent='○'; });
+  document.getElementById('btnConfirmPay').style.opacity='.4';
+  document.getElementById('btnConfirmPay').style.pointerEvents='none';
+  document.getElementById('deliveryAddr').value='';
+  document.getElementById('deliveryPhone').value='';
+  document.getElementById('deliveryNote').value='';
+  document.getElementById('qrInfo').style.display='none';
+  document.getElementById('depositInfo').style.display='none';
+  openModal('paymentModal');
+}
+
+function selectPayment(el, method){
+  document.querySelectorAll('.payment-opt').forEach(o=>{ o.classList.remove('selected'); o.querySelector('.pay-check').textContent='○'; });
+  el.classList.add('selected');
+  el.querySelector('.pay-check').textContent='●';
+  selectedPayment = method;
+  document.getElementById('btnConfirmPay').style.opacity='1';
+  document.getElementById('btnConfirmPay').style.pointerEvents='auto';
+  // Mostrar info según método
+  const qrInfo = document.getElementById('qrInfo');
+  const depositInfo = document.getElementById('depositInfo');
+  if(method === 'QR – Transferencia bancaria'){
+    qrInfo.style.display=''; depositInfo.style.display='none';
+  } else if(method === 'Contra entrega – 50% anticipo'){
+    depositInfo.style.display=''; qrInfo.style.display='none';
+    // Mostrar monto del anticipo
+    const total = cart.reduce((a,i)=>a+(i.price*i.qty),0);
+    const anticipo = Math.ceil(total * 0.5);
+    depositInfo.querySelector('p:last-child').innerHTML = `Anticipo a pagar ahora: <strong style="color:var(--primary)">Bs. ${anticipo}</strong> — Número: <strong style="color:var(--text)">+591 7XX XXXX</strong>`;
+  } else {
+    qrInfo.style.display='none'; depositInfo.style.display='none';
+  }
+}
+
+async function checkout(){
+  if(!cart.length){ showToast('Tu carrito está vacío'); return; }
+  if(!currentUser){ closeModal('paymentModal'); openModal('authModal'); return; }
+  if(!selectedPayment){ showToast('Selecciona un método de pago'); return; }
+  const addr = document.getElementById('deliveryAddr').value.trim();
+  const phone = document.getElementById('deliveryPhone').value.trim();
+  const note = document.getElementById('deliveryNote').value.trim();
   const total = cart.reduce((a,i)=>a+(i.price*i.qty),0);
   const order = {
     id: 'KUS'+Date.now(),
@@ -1061,7 +1212,11 @@ async function checkout(){
     user_email: currentUser.email,
     items: [...cart],
     total,
-    status: 'pendiente'
+    status: 'pendiente',
+    payment_method: selectedPayment,
+    delivery_address: addr,
+    delivery_phone: phone,
+    delivery_note: note,
   };
   const { error } = await sb.from('pedidos').insert(order);
   if(error){ showToast('Error al guardar el pedido'); console.error(error); return; }
@@ -1074,11 +1229,12 @@ async function checkout(){
     }
   }
   cart=[];
+  selectedPayment='';
   updateCartBadge();
   renderProds();
   renderSale();
-  closeModal('cartModal');
-  showToast('✓ ¡Pedido realizado con éxito! Nos contactaremos pronto.');
+  closeModal('paymentModal');
+  showToast(`✓ ¡Pedido realizado! Pago: ${order.payment_method}. Te contactaremos pronto.`);
 }
 
 // ===== WISHLIST =====
@@ -1095,7 +1251,6 @@ async function toggleWish(id){
     showToast('❤️ Agregado a favoritos');
   }
   renderProds(); renderSale();
-  if(currentProd && currentProd.id===id) document.getElementById('pdWishBtn').textContent = wishlist.includes(id)?'❤️':'🤍';
 }
 
 function renderWish(){
@@ -1201,6 +1356,7 @@ async function switchAdminTab(el, tabId){
   if(tabId==='tabProds') renderAdminProds();
   if(tabId==='tabOrders') await renderAllOrders();
   if(tabId==='tabUsers') await renderUsers();
+  if(tabId==='tabMarcas') await renderMarcasAdmin();
 }
 
 async function loadOrders(){
@@ -1211,6 +1367,52 @@ async function loadOrders(){
 async function loadUsers(){
   const { data, error } = await sb.from('usuarios').select('*');
   users = error ? [] : (data||[]);
+}
+
+async function renderMarcasAdmin(){
+  await loadMarcas();
+  const marcas = [...new Set(products.map(p=>p.marca).filter(Boolean))];
+  const el = document.getElementById('marcasAdmin');
+  if(!marcas.length){ el.innerHTML='<p style="color:var(--muted);font-size:13px">No hay marcas todavía. Agrega productos con marca primero.</p>'; return; }
+  el.innerHTML = marcas.map(m=>{
+    const img = marcasDB[m.toLowerCase()]||'';
+    return `<div style="background:var(--bg3);border:1px solid var(--border);padding:16px;margin-bottom:12px;display:flex;align-items:center;gap:16px">
+      <div style="width:80px;height:80px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden">
+        ${img ? `<img src="${img}" style="width:100%;height:100%;object-fit:contain;padding:6px" alt="${m}">` : '<span style="font-size:28px">👟</span>'}
+      </div>
+      <div style="flex:1">
+        <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px">${m}</div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <input type="file" accept="image/*" id="marcaImg_${m}" style="display:none" onchange="uploadMarcaImg('${m}',this)">
+          <button class="btn-edit" onclick="document.getElementById('marcaImg_${m}').click()">📷 ${img?'Cambiar imagen':'Subir imagen'}</button>
+          ${img ? `<button class="btn-del" onclick="deleteMarcaImg('${m}')">✕ Quitar imagen</button>` : ''}
+          <span style="font-size:11px;color:var(--muted)" id="marcaStatus_${m}"></span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function uploadMarcaImg(marca, input){
+  const file = input.files[0]; if(!file) return;
+  document.getElementById('marcaStatus_'+marca).textContent = 'Subiendo...';
+  const fileName = `marca_${marca.toLowerCase().replace(/\s/g,'_')}_${Date.now()}`;
+  const { error } = await sb.storage.from('imagenes').upload(fileName, file, {upsert:true});
+  if(error){ document.getElementById('marcaStatus_'+marca).textContent = 'Error al subir'; return; }
+  const { data } = sb.storage.from('imagenes').getPublicUrl(fileName);
+  await sb.from('marcas').upsert({ nombre:marca, img:data.publicUrl }, {onConflict:'nombre'});
+  await loadMarcas();
+  renderCats();
+  await renderMarcasAdmin();
+  showToast(`✓ Imagen de ${marca} guardada`);
+}
+
+async function deleteMarcaImg(marca){
+  await sb.from('marcas').update({ img:'' }).eq('nombre', marca);
+  await loadMarcas();
+  renderCats();
+  await renderMarcasAdmin();
+  showToast('Imagen eliminada');
 }
 
 async function refreshAdmin(){ await loadOrders(); await renderDash(); renderAdminProds(); }
@@ -1247,21 +1449,10 @@ async function updateOrderStatus(id, status){
 }
 
 function renderAdminProds(){
-  document.getElementById('adminProdBody').innerHTML = products.map(p=>`
-    <tr>
-      <td>${p.img ? `<img src="${p.img}" class="tbl-img" alt="">` : `<span class="tbl-emoji">${p.emoji||'👕'}</span>`}</td>
-      <td><strong>${p.name}</strong>${p.sale?' <span style="font-size:10px;color:#A8D400">OFERTA</span>':''}</td>
-      <td>${p.cat}</td>
-      <td>Bs. ${p.price}</td>
-      <td>${p.old ? `Bs. ${p.old}` : '—'}</td>
-      <td style="font-size:11px">${p.sizes||'—'}</td>
-      <td>${p.stock}</td>
-      <td>${p.sold||0}</td>
-      <td><div class="tbl-actions">
-        <button class="btn-edit" onclick="editProd(${p.id})">✏ Editar</button>
-        <button class="btn-del" onclick="deleteProd(${p.id})">🗑 Borrar</button>
-      </div></td>
-    </tr>`).join('');
+  document.getElementById("adminProdBody").innerHTML = products.map(p=>{
+    const tallasInfo = p.tallasStock && p.tallasStock.length ? p.tallasStock.map(t=>t.talla+":"+t.qty).join(", ") : (p.sizes||"—");
+    return `<tr><td>${p.img ? `<img src="${p.img}" class="tbl-img" alt="">` : `<span class="tbl-emoji">${p.emoji||"👟"}</span>`}</td><td><strong>${p.name}</strong>${p.sale?" <span style=font-size:10px;color:#A8D400>OFERTA</span>":""}</td><td>${p.marca||"—"}</td><td>Bs. ${p.price}</td><td>${p.old ? "Bs. "+p.old : "—"}</td><td style=font-size:11px>${tallasInfo}</td><td>${p.sold||0}</td><td><div class=tbl-actions><button class=btn-edit onclick="editProd(${p.id})">✏ Editar</button><button class=btn-del onclick="deleteProd(${p.id})">🗑 Borrar</button></div></td></tr>`;
+  }).join("");
 }
 
 async function renderAllOrders(){
@@ -1296,15 +1487,37 @@ async function renderUsers(){
 }
 
 // ===== PRODUCT FORM =====
+function addTallaRow(talla='', qty=''){
+  const div = document.createElement('div');
+  div.style.cssText='display:flex;gap:8px;align-items:center;margin-bottom:4px';
+  div.innerHTML=`
+    <input type="text" placeholder="Talla (ej: 41)" value="${talla}" style="flex:1;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:8px 10px;font-size:13px;font-family:inherit">
+    <input type="number" placeholder="Cantidad" value="${qty}" min="0" style="width:90px;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:8px 10px;font-size:13px;font-family:inherit">
+    <button type="button" onclick="this.parentElement.remove()" style="background:none;border:none;color:#E24B4A;font-size:18px;cursor:pointer;padding:4px">✕</button>`;
+  document.getElementById('tallasContainer').appendChild(div);
+}
+
+function getTallasFromForm(){
+  const rows = document.getElementById('tallasContainer').querySelectorAll('div');
+  const tallas = [];
+  rows.forEach(row=>{
+    const inputs = row.querySelectorAll('input');
+    const talla = inputs[0].value.trim();
+    const qty = parseInt(inputs[1].value)||0;
+    if(talla) tallas.push({talla, qty});
+  });
+  return tallas;
+}
+
 function openAddProd(){
   document.getElementById('prodFormTitle').textContent='+ Nuevo producto';
   document.getElementById('pfId').value='';
   document.getElementById('pfName').value='';
-  document.getElementById('pfCat').value='hombre';
+  document.getElementById('pfMarca').value='';
   document.getElementById('pfPrice').value='';
   document.getElementById('pfOld').value='';
-  document.getElementById('pfSizes').value='';
-  document.getElementById('pfStock').value='10';
+  document.getElementById('tallasContainer').innerHTML='';
+  addTallaRow();
   document.getElementById('pfDesc').value='';
   document.getElementById('pfEmoji').value='';
   document.getElementById('pfImgData').value='';
@@ -1319,11 +1532,15 @@ function editProd(id){
   document.getElementById('prodFormTitle').textContent='✏ Editar producto';
   document.getElementById('pfId').value=p.id;
   document.getElementById('pfName').value=p.name;
-  document.getElementById('pfCat').value=p.cat;
+  document.getElementById('pfMarca').value=p.marca||'';
   document.getElementById('pfPrice').value=p.price;
   document.getElementById('pfOld').value=p.old||'';
-  document.getElementById('pfSizes').value=p.sizes||'';
-  document.getElementById('pfStock').value=p.stock||0;
+  document.getElementById('tallasContainer').innerHTML='';
+  if(p.tallasStock && p.tallasStock.length){
+    p.tallasStock.forEach(t=>addTallaRow(t.talla, t.qty));
+  } else if(p.sizes){
+    p.sizes.split(',').forEach(s=>addTallaRow(s.trim(),''));
+  } else { addTallaRow(); }
   document.getElementById('pfDesc').value=p.desc||'';
   document.getElementById('pfEmoji').value=p.emoji||'';
   document.getElementById('pfImgData').value=p.img||'';
@@ -1333,32 +1550,56 @@ function editProd(id){
   openModal('prodFormModal');
 }
 
+
 async function saveProd(){
   const name=document.getElementById('pfName').value.trim();
   const price=parseFloat(document.getElementById('pfPrice').value);
   if(!name||isNaN(price)){ showToast('Completa nombre y precio'); return; }
   const id=document.getElementById('pfId').value;
+  const imgData = document.getElementById('pfImgData').value||'';
+  const fileInput = document.getElementById('pfImgInput');
+  let finalImg = imgData;
+  if(fileInput.files && fileInput.files[0] && !imgData.startsWith('http')){
+    showToast('Subiendo imagen, espera...');
+    const file = fileInput.files[0];
+    const fileName = `producto_${Date.now()}_${file.name.replace(/\s/g,'_')}`;
+    const { data, error } = await sb.storage.from('imagenes').upload(fileName, file, {upsert:true});
+    if(error){ showToast('Error al subir imagen'); console.error(error); return; }
+    const { data: urlData } = sb.storage.from('imagenes').getPublicUrl(fileName);
+    finalImg = urlData.publicUrl;
+  }
+  const tallasStock = getTallasFromForm();
   const p={
-    name, cat:document.getElementById('pfCat').value,
+    name, cat:'calzado',
+    marca: document.getElementById('pfMarca').value.trim(),
     price, old:parseFloat(document.getElementById('pfOld').value)||0,
-    sizes:document.getElementById('pfSizes').value.trim(),
-    stock:parseInt(document.getElementById('pfStock').value)||0,
+    tallasStock,
     desc:document.getElementById('pfDesc').value.trim(),
-    emoji:document.getElementById('pfEmoji').value||'👕',
-    img:document.getElementById('pfImgData').value||'',
+    emoji:document.getElementById('pfEmoji').value||'👟',
+    img:finalImg,
     sale:document.getElementById('pfSale').checked,
   };
   const dbRow = mapProductToDB(p);
-  if(id){
-    const { error } = await sb.from('productos').update(dbRow).eq('id', id);
-    if(error){ showToast('Error al guardar'); console.error(error); return; }
+  const numId = id ? parseInt(id) : null;
+  if(numId){
+    console.log('Actualizando producto ID:', numId, dbRow);
+    const { data, error } = await sb.from('productos').update(dbRow).eq('id', numId).select();
+    console.log('Resultado update:', data, error);
+    if(error){ showToast('Error al guardar: '+error.message); console.error(error); return; }
   } else {
     dbRow.sold = 0;
-    const { error } = await sb.from('productos').insert(dbRow);
-    if(error){ showToast('Error al guardar'); console.error(error); return; }
+    const { data, error } = await sb.from('productos').insert(dbRow).select();
+    console.log('Resultado insert:', data, error);
+    if(error){ showToast('Error al guardar: '+error.message); console.error(error); return; }
   }
   await loadProducts();
+  // Auto-registrar la marca si es nueva
+  if(p.marca){
+    await sb.from('marcas').upsert({ nombre:p.marca }, { onConflict:'nombre', ignoreDuplicates:true });
+    await loadMarcas();
+  }
   closeModal('prodFormModal');
+  renderCats();
   renderProds(); renderSale(); renderAdminProds();
   showToast('✓ Producto guardado');
 }
@@ -1372,15 +1613,23 @@ async function deleteProd(id){
   showToast('Producto eliminado');
 }
 
-function previewProdImg(e){
+async function previewProdImg(e){
   const file=e.target.files[0]; if(!file) return;
+  // Mostrar preview local inmediatamente
   const reader=new FileReader();
   reader.onload=ev=>{
     document.getElementById('pfImgPreview').src=ev.target.result;
     document.getElementById('pfImgPreviewWrap').style.display='';
-    document.getElementById('pfImgData').value=ev.target.result;
   };
   reader.readAsDataURL(file);
+  // Subir a Supabase Storage
+  showToast('Subiendo imagen...');
+  const fileName = `producto_${Date.now()}_${file.name.replace(/\s/g,'_')}`;
+  const { data, error } = await sb.storage.from('imagenes').upload(fileName, file, { upsert:true });
+  if(error){ showToast('Error al subir imagen: '+error.message); console.error(error); return; }
+  const { data: urlData } = sb.storage.from('imagenes').getPublicUrl(fileName);
+  document.getElementById('pfImgData').value = urlData.publicUrl;
+  showToast('✓ Imagen subida correctamente');
 }
 
 function clearProdImg(){
@@ -1422,6 +1671,7 @@ async function resetColors(){
 
 // ===== CONFIG =====
 async function saveConfig(){
+  config.year=document.getElementById('cfgYear').value.trim()||'2026';
   config.name=document.getElementById('cfgName').value.trim()||'KUSTOM';
   config.city=document.getElementById('cfgCity').value.trim();
   config.hero=document.getElementById('cfgHero').value.trim();
@@ -1433,7 +1683,8 @@ async function saveConfig(){
   if(newPass.length>=4) config.adminPass=newPass;
   const { error } = await sb.from('configuracion').update({
     name:config.name, city:config.city, hero:config.hero, wa:config.wa,
-    ig:config.ig, addr:config.addr, hours:config.hours, admin_pass:config.adminPass
+    ig:config.ig, addr:config.addr, hours:config.hours, admin_pass:config.adminPass,
+    colors: {...(config.colors||{}), year:config.year}
   }).eq('id',1);
   if(error){ showToast('Error al guardar configuración'); return; }
   applyConfig();
