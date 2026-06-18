@@ -817,24 +817,30 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
     </div>
     <div class="modal-body">
       <input type="hidden" id="pfId">
+      <div class="form-group"><label>Nombre del producto</label><input type="text" id="pfName" placeholder="Ej: Hoodie Oversized, Tenis Air Max..."></div>
       <div class="form-row">
-        <div class="form-group"><label>Nombre del producto</label><input type="text" id="pfName" placeholder="Ej: Hoodie Oversized"></div>
         <div class="form-group"><label>Categoría</label>
-          <select id="pfCat">
-            <option value="calzado">Calzado</option>
-          </select>
+          <input type="text" id="pfCat" placeholder="Calzado, Ropa, Gorras..." list="catSuggestions">
+          <datalist id="catSuggestions">
+            <option value="Calzado">
+            <option value="Ropa">
+            <option value="Gorras">
+            <option value="Accesorios">
+            <option value="Deportivo">
+            <option value="Bolsos">
+          </datalist>
         </div>
+        <div class="form-group"><label>Marca</label><input type="text" id="pfMarca" placeholder="Nike, Adidas, Zara..."></div>
       </div>
       <div class="form-row">
         <div class="form-group"><label>Precio (Bs.)</label><input type="number" id="pfPrice" placeholder="180"></div>
         <div class="form-group"><label>Precio anterior (opcional)</label><input type="number" id="pfOld" placeholder="220"></div>
       </div>
-      <div class="form-group"><label>Marca</label><input type="text" id="pfMarca" placeholder="Ej: Nike, Adidas, Puma..."></div>
       <div class="form-group">
         <label>Tallas y cantidad disponible</label>
         <div id="tallasContainer" style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px"></div>
         <button type="button" onclick="addTallaRow()" style="background:transparent;border:1px dashed var(--border);color:var(--primary);padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;width:100%">+ Agregar talla</button>
-        <p class="form-hint">Agrega cada talla con su cantidad. Ej: Talla 41 → 5 unidades</p>
+        <p class="form-hint">Ej: Talla 41 → 5 unidades / Talla M → 3 unidades. Si no hay tallas deja vacío.</p>
       </div>
       <div class="form-group"><label>Descripción</label><textarea id="pfDesc" placeholder="Descripción del producto..."></textarea></div>
       <div class="form-group"><label>Imagen del producto</label>
@@ -901,7 +907,7 @@ function mapProductToDB(p){
   const totalStock = p.tallasStock && p.tallasStock.length
     ? p.tallasStock.reduce((a,t)=>a+Number(t.qty||0),0)
     : (p.stock||0);
-  return { name:p.name, cat:'calzado', price:p.price, old:p.old||0,
+  return { name:p.name, cat:p.cat||'calzado', price:p.price, old:p.old||0,
     sizes: p.tallasStock && p.tallasStock.length ? p.tallasStock.map(t=>t.talla).join(',') : (p.sizes||''),
     stock:totalStock, descripcion:p.desc||'', emoji:p.emoji||'👟', img:p.img||'',
     sale:!!p.sale, sold:p.sold||0, marca:p.marca||'',
@@ -999,7 +1005,7 @@ function applyConfig(){
 function renderFooterMarcas(){
   const marcas = [...new Set(products.map(p=>p.marca).filter(Boolean))];
   const el = document.getElementById('footerMarcas');
-  if(el) el.innerHTML = marcas.map(m=>`<a onclick="scrollToId('newSection');filterProds(null,'${m}')">${m}</a>`).join('');
+  if(el) el.innerHTML = marcas.map(m=>`<a onclick="scrollToId('newSection');filterProds(null,'marca','${m}')">${m}</a>`).join('');
 }
 
 function applyStoredColors(){
@@ -1023,15 +1029,13 @@ async function loadMarcas(){
 
 function renderCats(){
   const marcas = [...new Set(products.map(p=>p.marca).filter(Boolean))];
+  const cats = [...new Set(products.map(p=>p.cat).filter(Boolean))];
   document.getElementById('catGrid').innerHTML = marcas.length ? marcas.map(m=>{
     const img = marcasDB[m.toLowerCase()]||'';
     const inner = img
       ? `<img src="${img}" alt="${m}" style="width:100%;height:100%;object-fit:contain;padding:14px;position:absolute;inset:0">
          <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.6);padding:8px 0;text-align:center">
            <span class="cat-label">${m}</span>
-         </div>
-         <div style="position:absolute;top:8px;right:8px">
-           <span class="cat-btn">▶ Ver</span>
          </div>`
       : `<span class="cat-emoji">👟</span>
          <span class="cat-label">${m}</span>
@@ -1040,10 +1044,12 @@ function renderCats(){
       <div class="cat-inner">${inner}</div>
     </div>`;
   }).join('') :
-    `<p style="color:var(--muted);font-size:13px;padding:20px 0">Agrega productos con marca desde el panel admin.</p>`;
+    `<p style="color:var(--muted);font-size:13px;padding:20px 0">Agrega productos desde el panel admin.</p>`;
+  // Tabs: Todos + marcas + categorias
   const tabs = document.getElementById('filterTabs');
-  tabs.innerHTML = `<button class="ptab active" onclick="filterProds(this,'todos')">Todos</button>` +
-    marcas.map(m=>`<button class="ptab" onclick="filterProds(this,'${m}')">${m}</button>`).join('');
+  const marcaTabs = marcas.map(m=>`<button class="ptab" onclick="filterProds(this,'marca','${m}')">${m}</button>`).join('');
+  const catTabs = cats.map(c=>`<button class="ptab" onclick="filterProds(this,'cat','${c}')">${c}</button>`).join('');
+  tabs.innerHTML = `<button class="ptab active" onclick="filterProds(this,'todos','todos')">Todos</button>${marcaTabs}${catTabs}`;
 }
 
 
@@ -1071,7 +1077,7 @@ function prodCard(p, isSale=false){
   return `<div class="prod-card" data-cat="${p.cat}" onclick="openProdDetail(${p.id})" style="cursor:pointer">
     <div class="prod-img-wrap">${imgContent}${badge}</div>
     <div class="prod-info">
-      <div class="prod-cat">${p.marca||p.cat}</div>
+      <div class="prod-cat">${p.marca ? `${p.marca} · ${p.cat}` : p.cat}</div>
       <div class="prod-name">${p.name}</div>
       ${p.sizes ? `<div class="prod-sizes">${p.sizes.split(",").slice(0,4).map(s=>`<span class="size-tag">${s.trim()}</span>`).join("")}</div>` : ""}
       <div class="prod-row"><span class="prod-price">Bs. ${p.price}</span>${p.old && p.old>p.price ? `<span class="prod-old">Bs. ${p.old}</span><span class="prod-pct">${pct}</span>` : ""}</div>
@@ -1083,23 +1089,19 @@ function prodCard(p, isSale=false){
 
 function selectMarca(marca){
   scrollToId('newSection');
-  // Activar el tab correcto
-  const tabs = document.querySelectorAll('.ptab');
-  tabs.forEach(t=>{
-    if(t.textContent===marca){ t.click(); }
-  });
+  const tab = [...document.querySelectorAll('.ptab')].find(t=>t.textContent===marca);
+  if(tab) tab.click();
+  else filterProds(null,'marca',marca);
 }
 
-function filterProds(el, marca){
+function filterProds(el, tipo, valor){
   document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('active'));
   if(el) el.classList.add('active');
-  else {
-    const tab = [...document.querySelectorAll('.ptab')].find(t=>t.textContent===marca);
-    if(tab) tab.classList.add('active');
-  }
-  const prods = marca==='todos'
-    ? products
-    : products.filter(p=>p.marca && p.marca.toLowerCase()===marca.toLowerCase());
+  let prods;
+  if(!tipo||tipo==='todos') prods = products;
+  else if(tipo==='marca') prods = products.filter(p=>p.marca && p.marca.toLowerCase()===(valor||'').toLowerCase());
+  else if(tipo==='cat') prods = products.filter(p=>p.cat && p.cat.toLowerCase()===(valor||'').toLowerCase());
+  else prods = products;
   renderProds(prods);
 }
 
@@ -1577,6 +1579,7 @@ function openAddProd(){
   document.getElementById('prodFormTitle').textContent='+ Nuevo producto';
   document.getElementById('pfId').value='';
   document.getElementById('pfName').value='';
+  document.getElementById('pfCat').value='';
   document.getElementById('pfMarca').value='';
   document.getElementById('pfPrice').value='';
   document.getElementById('pfOld').value='';
@@ -1596,6 +1599,7 @@ function editProd(id){
   document.getElementById('prodFormTitle').textContent='✏ Editar producto';
   document.getElementById('pfId').value=p.id;
   document.getElementById('pfName').value=p.name;
+  document.getElementById('pfCat').value=p.cat||'';
   document.getElementById('pfMarca').value=p.marca||'';
   document.getElementById('pfPrice').value=p.price;
   document.getElementById('pfOld').value=p.old||'';
@@ -1634,7 +1638,7 @@ async function saveProd(){
   }
   const tallasStock = getTallasFromForm();
   const p={
-    name, cat:'calzado',
+    name, cat:document.getElementById('pfCat').value.trim()||'Calzado',
     marca: document.getElementById('pfMarca').value.trim(),
     price, old:parseFloat(document.getElementById('pfOld').value)||0,
     tallasStock,
