@@ -1398,6 +1398,8 @@ function openInfoModal(tipo){
   openModal('infoModal');
 }
 
+function openAdminLogin(){ openModal('adminLoginModal'); }
+
 async function doAdminLogin(){
   const pass = document.getElementById('adminPass').value;
   if(pass !== config.adminPass){ document.getElementById('adminLoginAlert').innerHTML='<div class="alert alert-error">Contraseña incorrecta</div>'; return; }
