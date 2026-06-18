@@ -970,23 +970,6 @@ function applyConfig(){
   if(document.getElementById('igHandle')) document.getElementById('igHandle').textContent=c.ig;
   if(document.getElementById('storeAddress')) document.getElementById('storeAddress').textContent=c.addr;
   if(document.getElementById('storeHours')) document.getElementById('storeHours').textContent=c.hours;
-  // Mostrar botón admin solo para el correo administrador
-  const adminBtn = document.getElementById('adminFooterBtn');
-  if(adminBtn && currentUser && currentUser.email === 'samaelcolque42@gmail.com'){
-    adminBtn.style.display = 'block';
-  }
-  // Actualizar marcas en footer
-  renderFooterMarcas();
-}
-
-function renderFooterMarcas(){
-  const marcas = [...new Set(products.map(p=>p.marca).filter(Boolean))];
-  const el = document.getElementById('footerMarcas');
-  if(el) el.innerHTML = marcas.map(m=>`<a onclick="scrollToId('newSection');filterProds(null,'${m}')">${m}</a>`).join('');
-}
-  if(document.getElementById('storeYear2')) document.getElementById('storeYear2').textContent=c.year||'2026';
-  if(document.getElementById('storeYear3')) document.getElementById('storeYear3').textContent=c.year||'2026';
-  if(document.getElementById('cfgYear')) document.getElementById('cfgYear').value=c.year||'2026';
   if(document.getElementById('storeYear')) document.getElementById('storeYear').textContent=c.year||'2026';
   if(document.getElementById('storeYear2')) document.getElementById('storeYear2').textContent=c.year||'2026';
   if(document.getElementById('storeYear3')) document.getElementById('storeYear3').textContent=c.year||'2026';
@@ -1004,6 +987,19 @@ function renderFooterMarcas(){
   if(document.getElementById('cfgIG')) document.getElementById('cfgIG').value=c.ig;
   if(document.getElementById('cfgAddr')) document.getElementById('cfgAddr').value=c.addr;
   if(document.getElementById('cfgHours')) document.getElementById('cfgHours').value=c.hours;
+  // Mostrar botón admin solo para el correo administrador
+  const adminBtn = document.getElementById('adminFooterBtn');
+  if(adminBtn && currentUser && currentUser.email === 'samaelcolque42@gmail.com'){
+    adminBtn.style.display = 'block';
+  }
+  // Actualizar marcas en footer
+  renderFooterMarcas();
+}
+
+function renderFooterMarcas(){
+  const marcas = [...new Set(products.map(p=>p.marca).filter(Boolean))];
+  const el = document.getElementById('footerMarcas');
+  if(el) el.innerHTML = marcas.map(m=>`<a onclick="scrollToId('newSection');filterProds(null,'${m}')">${m}</a>`).join('');
 }
 
 function applyStoredColors(){
