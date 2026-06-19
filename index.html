@@ -739,7 +739,15 @@ const SUPABASE_URL = 'https://xtxaurlrtoswghjqxcfo.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh0eGF1cmxydG9zd2doanF4Y2ZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1Mzk3NjYsImV4cCI6MjA5NzExNTc2Nn0.2n5tGKcZ_YeKVuIMPDi_B0kwHLgEUopMMVpvZ_arfrw';
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const ADMIN_EMAIL = 'samaelcolque42@gmail.com';
-const NEW_HOURS = 48; // horas que un producto aparece en Novedades
+const NEW_HOURS = 48;
+
+// ===== UTILS (definidas primero para que los onclick del HTML funcionen) =====
+function scrollToId(id){ const el=document.getElementById(id); if(el) el.scrollIntoView({behavior:'smooth'}); }
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
+function openModal(id){ document.getElementById(id).classList.add('open'); if(id==='cartModal') renderCart(); if(id==='profileModal') renderProfile(); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+function openAdminLogin(){ openModal('adminLoginModal'); }
+function openUserModal(){ if(currentUser){ renderProfile(); openModal('profileModal'); } else openModal('authModal'); } // horas que un producto aparece en Novedades
 
 // SUBCATEGORÍAS por género
 const SUBCATS = {
@@ -1606,11 +1614,7 @@ async function saveConfig(){
 }
 
 // ===== MODALS / UTILS =====
-function openModal(id){ document.getElementById(id).classList.add('open'); if(id==='cartModal') renderCart(); if(id==='profileModal') renderProfile(); }
-function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 document.querySelectorAll('.overlay').forEach(ov=>ov.addEventListener('click',e=>{ if(e.target===ov) ov.classList.remove('open'); }));
-function scrollToId(id){ const el=document.getElementById(id); if(el) el.scrollIntoView({behavior:'smooth'}); }
-function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
 
 // ===== COUNTDOWN =====
 let secs=2*3600+47*60+30;
