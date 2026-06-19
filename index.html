@@ -1141,7 +1141,6 @@ function changeQty(idx,d){ cart[idx].qty=Math.max(1,cart[idx].qty+d); updateCart
 function removeCartItem(idx){ cart.splice(idx,1); updateCartBadge(); renderCart(); }
 
 // ===== PAYMENT =====
-let selectedPayment='';
 function openPayment(){
   if(!cart.length){ showToast('Tu carrito está vacío'); return; }
   if(!currentUser){ closeModal('cartModal'); openModal('authModal'); showToast('Inicia sesión para continuar'); return; }
