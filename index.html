@@ -276,7 +276,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
     <div class="hero-badges">
       <span class="hbadge">🚚 Envíos Bolivia</span>
       <span class="hbadge">🛡️ Compra segura</span>
-      <span class="hbadge">🔄 15 días cambios</span>
+      <span class="hbadge">🔄 2 días cambios</span>
     </div>
   </div>
   <div class="hero-carousel" id="heroCarousel">
@@ -358,7 +358,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
   </div>
 </section>
 <div class="footer-info">
-  <div class="fi"><span class="fi-icon">🔄</span><div><div class="fi-title">Cambios fáciles</div><div class="fi-sub">15 días para cambios</div></div></div>
+  <div class="fi"><span class="fi-icon">🔄</span><div><div class="fi-title">Cambios fáciles</div><div class="fi-sub">2 días para cambios</div></div></div>
   <div class="fi"><span class="fi-icon">🔒</span><div><div class="fi-title">Compra segura</div><div class="fi-sub">Tus datos protegidos</div></div></div>
   <div class="fi"><span class="fi-icon">🎧</span><div><div class="fi-title">Atención 24/7</div><div class="fi-sub">Siempre para ayudarte</div></div></div>
 </div>
@@ -395,15 +395,68 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
 <!-- CART -->
 <div class="overlay" id="cartModal"><div class="modal"><div class="modal-header"><h2>🛍️ Tu carrito</h2><button class="modal-close" onclick="closeModal('cartModal')">✕</button></div><div class="modal-body"><div id="cartItems"></div><div class="cart-total"><span>Total:</span><span id="cartTotal">Bs. 0</span></div><button class="btn-f" onclick="openPayment()">✓ Finalizar compra</button></div></div></div>
 <!-- PAYMENT -->
-<div class="overlay" id="paymentModal"><div class="modal" style="max-width:420px"><div class="modal-header"><h2>💳 Método de pago</h2><button class="modal-close" onclick="closeModal('paymentModal')">✕</button></div><div class="modal-body">
-  <div class="fg"><label>Dirección de entrega</label><input type="text" id="deliveryAddr" placeholder="Tu dirección en La Paz"></div>
-  <div class="fg"><label>Teléfono</label><input type="tel" id="deliveryPhone" placeholder="+591 7XX XXXX"></div>
-  <div class="fg"><label>Nota (opcional)</label><input type="text" id="deliveryNote" placeholder="Instrucciones especiales..."></div>
-  <p style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Método de pago:</p>
-  <div class="pay-opt" onclick="selectPayment(this,'QR')"><span style="font-size:22px">📱</span><div><div class="pay-name">QR – Transferencia bancaria</div><div class="pay-sub">Escanea y paga el total</div></div><span class="pay-check">○</span></div>
-  <div class="pay-opt" onclick="selectPayment(this,'CE')"><span style="font-size:22px">🚚</span><div><div class="pay-name">Contra entrega</div><div class="pay-sub">50% anticipo + 50% al recibir</div></div><span class="pay-check">○</span></div>
-  <div id="payInfo" style="display:none;margin-top:12px;background:var(--bg3);border:1px solid var(--border);padding:14px;font-size:12px;color:var(--muted)"></div>
-  <button class="btn-f" id="btnConfirmPay" onclick="checkout()" style="opacity:.4;pointer-events:none;margin-top:14px">Confirmar pedido</button>
+<div class="overlay" id="paymentModal"><div class="modal" style="max-width:460px"><div class="modal-header"><h2>💳 Método de pago</h2><button class="modal-close" onclick="closeModal('paymentModal')">✕</button></div><div class="modal-body">
+
+  <!-- PASO 1: Datos de entrega -->
+  <div id="payStep1">
+    <p style="font-size:12px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">📦 Paso 1 — Datos de entrega</p>
+    <div class="fg"><label>¿Cómo recibirás tu pedido?</label>
+      <select id="deliveryType" onchange="toggleDeliveryType()">
+        <option value="domicilio">🏠 Entrega a domicilio</option>
+        <option value="encuentro">📍 Punto de encuentro</option>
+      </select>
+    </div>
+    <div class="fg" id="deliveryAddrWrap"><label>Dirección de entrega</label><input type="text" id="deliveryAddr" placeholder="Calle, número, zona, referencia..."></div>
+    <div class="fg" id="deliveryMeetWrap" style="display:none"><label>Punto de encuentro</label><input type="text" id="deliveryMeet" placeholder="Ej: Plaza Murillo, frente al banco..."></div>
+    <div class="fg"><label>Teléfono de contacto</label><input type="tel" id="deliveryPhone" placeholder="+591 7XX XXXX"></div>
+    <div class="fg"><label>Nota adicional (opcional)</label><input type="text" id="deliveryNote" placeholder="Horario preferido, instrucciones..."></div>
+
+    <p style="font-size:12px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.5px;margin:16px 0 10px">💳 Paso 2 — Método de pago</p>
+    <div class="pay-opt" onclick="selectPayment(this,'QR')"><span style="font-size:22px">📱</span><div><div class="pay-name">QR – Transferencia bancaria</div><div class="pay-sub">Escanea el QR y paga el total</div></div><span class="pay-check">○</span></div>
+    <div class="pay-opt" onclick="selectPayment(this,'CE')"><span style="font-size:22px">🚚</span><div><div class="pay-name">Contra entrega</div><div class="pay-sub">50% anticipo por QR + 50% al recibir</div></div><span class="pay-check">○</span></div>
+
+    <!-- QR DISPLAY -->
+    <div id="qrDisplay" style="display:none;margin-top:14px;background:var(--bg3);border:1px solid var(--primary);padding:16px;text-align:center">
+      <p style="font-size:12px;font-weight:700;color:var(--primary);margin-bottom:10px" id="qrDisplayTitle">Escanea el QR para pagar</p>
+      <div id="qrImgWrap" style="background:white;padding:10px;display:inline-block;margin-bottom:10px">
+        <img id="qrImg" src="" alt="QR" style="width:180px;height:180px;object-fit:contain;display:none">
+        <div id="qrPlaceholder" style="width:180px;height:180px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px">
+          <span style="font-size:36px">📱</span>
+          <p style="font-size:11px;color:#666;text-align:center">QR no configurado<br>Configura desde Admin → Config</p>
+        </div>
+      </div>
+      <p style="font-size:11px;color:var(--muted)" id="qrAmountText"></p>
+      <p style="font-size:11px;color:var(--muted);margin-top:4px">Después de pagar, sube tu comprobante abajo</p>
+    </div>
+
+    <!-- COMPROBANTE -->
+    <div id="comprobanteWrap" style="display:none;margin-top:14px">
+      <p style="font-size:12px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">📸 Paso 3 — Comprobante de pago</p>
+      <div class="upload-area" onclick="document.getElementById('comprobanteInput').click()" style="padding:12px">
+        <span style="font-size:24px">📷</span>
+        <p>Toca para subir foto del comprobante</p>
+        <p style="font-size:10px;margin-top:4px">Captura de pantalla o foto del depósito</p>
+      </div>
+      <input type="file" id="comprobanteInput" accept="image/*" style="display:none" onchange="previewComprobante(event)">
+      <div id="comprobantePreviewWrap" style="display:none;margin-top:8px;text-align:center">
+        <img id="comprobantePreview" style="max-width:100%;max-height:200px;border:1px solid var(--border)" alt="Comprobante">
+        <button onclick="clearComprobante()" style="display:block;margin:6px auto 0;background:none;border:none;color:#E24B4A;font-size:12px;cursor:pointer">✕ Quitar imagen</button>
+      </div>
+      <input type="hidden" id="comprobanteData">
+      <p style="font-size:11px;color:var(--muted);margin-top:6px;text-align:center">También puedes enviarlo por WhatsApp después</p>
+    </div>
+
+    <!-- ELEGIR NÚMERO WA -->
+    <div id="waChoiceWrap" style="display:none;margin-top:14px">
+      <p style="font-size:12px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">📱 ¿A qué número envías el comprobante?</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="wa-choice-btn" id="waChoice1" onclick="selectWA(1)" style="flex:1;padding:10px;background:var(--bg3);border:1px solid var(--border);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s">📱 +591 65142115</button>
+        <button class="wa-choice-btn" id="waChoice2" onclick="selectWA(2)" style="flex:1;padding:10px;background:var(--bg3);border:1px solid var(--border);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s">📱 +591 65102615</button>
+      </div>
+    </div>
+
+    <button class="btn-f" id="btnConfirmPay" onclick="checkout()" style="opacity:.4;pointer-events:none;margin-top:16px">✓ Confirmar pedido y abrir WhatsApp</button>
+  </div>
 </div></div></div>
 <!-- SEARCH -->
 <div class="overlay" id="searchModal"><div class="modal"><div class="modal-header"><h2>🔍 Buscar</h2><button class="modal-close" onclick="closeModal('searchModal')">✕</button></div><div class="modal-body"><div class="fg"><input type="text" id="searchInput" placeholder="Nombre, marca, categoría, género..." oninput="doSearch()"></div><div class="prod-grid" id="searchResults" style="grid-template-columns:repeat(auto-fill,minmax(140px,1fr))"></div></div></div></div>
@@ -518,7 +571,13 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
       <div class="fg"><label>Descripción footer</label><textarea id="cfgFooterDesc" rows="2"></textarea></div>
       <div class="fr"><div class="fg"><label>WhatsApp 1</label><input type="text" id="cfgWA1" value="+591 65142115"></div><div class="fg"><label>WhatsApp 2</label><input type="text" id="cfgWA2" value="+591 65102615"></div></div>
       <div class="fr"><div class="fg"><label>Dirección / Ubicación</label><input type="text" id="cfgAddr" value="La Paz, Bolivia"></div><div class="fg"><label>Horario</label><input type="text" id="cfgHours" value="Lun–Sáb 9–20h"></div></div>
-      <h4 style="font-size:13px;font-weight:700;color:var(--primary);margin:16px 0 10px;text-transform:uppercase">⏱ Cronómetro de ofertas</h4>
+      <h4 style="font-size:13px;font-weight:700;color:var(--primary);margin:16px 0 10px;text-transform:uppercase">📱 Código QR de pago</h4>
+      <div class="fg"><label>Imagen del QR actual</label>
+        <div id="qrAdminPreviewWrap" style="margin-bottom:8px;display:none"><img id="qrAdminPreview" style="max-width:180px;border:1px solid var(--border);background:white;padding:8px" alt="QR actual"></div>
+        <div class="upload-area" onclick="document.getElementById('qrInput').click()"><span style="font-size:24px">📱</span><p>Haz clic para subir o cambiar el QR</p><p style="font-size:10px;margin-top:4px">PNG, JPG — imagen del código QR</p></div>
+        <input type="file" id="qrInput" accept="image/*" style="display:none" onchange="uploadQR(event)">
+        <span style="font-size:11px;color:var(--muted)" id="qrStatus"></span>
+      </div>
       <div class="fg"><label>Título</label><input type="text" id="cfgOfferTitle" placeholder="Ej: Ofertas de temporada"></div>
       <div class="fg"><label>Subtítulo</label><input type="text" id="cfgOfferSub" placeholder="Ej: Solo por tiempo limitado"></div>
       <div class="fg"><label>Fecha y hora de fin</label><input type="datetime-local" id="cfgOfferEnd"><p class="hint">Déjalo vacío para ocultar el cronómetro.</p></div>
@@ -609,7 +668,7 @@ async function init(){
 async function loadConfig(){
   const{data}=await sb.from('configuracion').select('*').eq('id',1).single();
   if(!data)return;const c=data.colors||{};
-  config={name:data.name,city:data.city,hero:data.hero,wa1:c.wa1||data.wa||DEF_CFG.wa1,wa2:c.wa2||DEF_CFG.wa2,addr:data.addr,hours:data.hours,adminPass:data.admin_pass||'kustom2025',year:c.year||'2026',footerDesc:c.footerDesc||'',offerTitle:c.offerTitle||'Ofertas de temporada',offerSub:c.offerSub||'Solo por tiempo limitado',offerEnd:c.offerEnd||'',infoTexts:c.infoTexts||DEF_CFG.infoTexts,colors:c};
+  config={name:data.name,city:data.city,hero:data.hero,wa1:c.wa1||data.wa||DEF_CFG.wa1,wa2:c.wa2||DEF_CFG.wa2,addr:data.addr,hours:data.hours,adminPass:data.admin_pass||'kustom2025',year:c.year||'2026',footerDesc:c.footerDesc||'',offerTitle:c.offerTitle||'Ofertas de temporada',offerSub:c.offerSub||'Solo por tiempo limitado',offerEnd:c.offerEnd||'',qrUrl:c.qrUrl||'',infoTexts:c.infoTexts||DEF_CFG.infoTexts,colors:c};
 }
 async function loadProducts(){const{data}=await sb.from('productos').select('*').order('created_at',{ascending:false});products=(data||[]).map(mapFromDB);}
 async function loadMarcas(){const{data}=await sb.from('marcas').select('*');marcasDB={};(data||[]).forEach(m=>{marcasDB[m.nombre.toLowerCase()]=m.img;});}
@@ -814,32 +873,102 @@ function changeQty(idx,d){cart[idx].qty=Math.max(1,cart[idx].qty+d);updateCartBa
 function removeCartItem(idx){cart.splice(idx,1);updateCartBadge();renderCart();}
 
 // PAYMENT
+let selectedWA=1;
+function toggleDeliveryType(){const t=document.getElementById('deliveryType').value;document.getElementById('deliveryAddrWrap').style.display=t==='domicilio'?'':'none';document.getElementById('deliveryMeetWrap').style.display=t==='encuentro'?'':'none';checkPaymentReady();}
+function checkPaymentReady(){
+  const delivType=document.getElementById('deliveryType').value;
+  const addr=delivType==='domicilio'?document.getElementById('deliveryAddr').value.trim():document.getElementById('deliveryMeet').value.trim();
+  const phone=document.getElementById('deliveryPhone').value.trim();
+  const ready=!!(selectedPayment&&selectedWA&&addr&&phone);
+  document.getElementById('btnConfirmPay').style.opacity=ready?'1':'.4';
+  document.getElementById('btnConfirmPay').style.pointerEvents=ready?'auto':'none';
+}
+function selectWA(num){
+  selectedWA=num;
+  [1,2].forEach(n=>{const b=document.getElementById('waChoice'+n);if(b){b.style.background=n===num?'var(--primary)':'var(--bg3)';b.style.color=n===num?'#111':'var(--text)';b.style.borderColor=n===num?'var(--primary)':'var(--border)';}});
+  checkPaymentReady();
+}
 function openPayment(){
   if(!cart.length){showToast('Tu carrito esta vacio');return;}
   if(!currentUser){closeModal('cartModal');openModal('authModal');showToast('Inicia sesion para continuar');return;}
-  selectedPayment='';
+  selectedPayment='';selectedWA=1;
   document.querySelectorAll('.pay-opt').forEach(o=>{o.classList.remove('selected');o.querySelector('.pay-check').textContent='○';});
   document.getElementById('btnConfirmPay').style.opacity='.4';document.getElementById('btnConfirmPay').style.pointerEvents='none';
-  ['deliveryAddr','deliveryPhone','deliveryNote'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
-  document.getElementById('payInfo').style.display='none';
+  ['deliveryAddr','deliveryPhone','deliveryNote','deliveryMeet'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  const dt=document.getElementById('deliveryType');if(dt)dt.value='domicilio';toggleDeliveryType();
+  ['qrDisplay','comprobanteWrap','waChoiceWrap'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display='none';});
+  const cd=document.getElementById('comprobanteData');if(cd)cd.value='';
+  const cpw=document.getElementById('comprobantePreviewWrap');if(cpw)cpw.style.display='none';
+  const ci=document.getElementById('comprobanteInput');if(ci)ci.value='';
+  [1,2].forEach(n=>{const b=document.getElementById('waChoice'+n);if(b){b.style.background='var(--bg3)';b.style.color='var(--text)';b.style.borderColor='var(--border)';}});
   closeModal('cartModal');openModal('paymentModal');
 }
 function selectPayment(el,method){
   document.querySelectorAll('.pay-opt').forEach(o=>{o.classList.remove('selected');o.querySelector('.pay-check').textContent='○';});
   el.classList.add('selected');el.querySelector('.pay-check').textContent='●';selectedPayment=method;
-  document.getElementById('btnConfirmPay').style.opacity='1';document.getElementById('btnConfirmPay').style.pointerEvents='auto';
-  const total=cart.reduce((a,i)=>a+(i.price*i.qty),0);const pi=document.getElementById('payInfo');pi.style.display='';
-  if(method==='QR')pi.innerHTML=`<strong style="color:var(--primary)">Escanea el QR para pagar</strong><br>Numero: ${config.wa1||DEF_CFG.wa1}<br>Envia el comprobante por WhatsApp.`;
-  else pi.innerHTML=`<strong style="color:#A8D400">Anticipo requerido</strong><br>Paga el <strong>50% (Bs. ${Math.ceil(total*0.5)})</strong> por QR.<br>Numero: ${config.wa1||DEF_CFG.wa1}`;
-}
-async function checkout(){
-  const addr=document.getElementById('deliveryAddr').value.trim();const phone=document.getElementById('deliveryPhone').value.trim();
-  if(!addr||!phone){showToast('Completa direccion y telefono');return;}if(!selectedPayment){showToast('Elige un metodo de pago');return;}
   const total=cart.reduce((a,i)=>a+(i.price*i.qty),0);
-  const order={id:'KUS'+Date.now(),user_id:currentUser.id,user_name:currentUser.name,user_email:currentUser.email,items:[...cart],total,status:'pendiente',payment_method:selectedPayment,delivery_address:addr,delivery_phone:phone,delivery_note:document.getElementById('deliveryNote').value};
-  const{error}=await sb.from('pedidos').insert(order);if(error){showToast('Error al guardar el pedido');return;}
+  const amount=method==='CE'?Math.ceil(total*0.5):total;
+  const qrUrl=config.qrUrl||(config.colors&&config.colors.qrUrl)||'';
+  const qd=document.getElementById('qrDisplay');if(qd)qd.style.display='';
+  const qt=document.getElementById('qrDisplayTitle');if(qt)qt.textContent=method==='CE'?`Paga el anticipo (Bs. ${amount}) por QR`:`Escanea el QR y paga Bs. ${amount}`;
+  const qa=document.getElementById('qrAmountText');if(qa)qa.textContent=method==='CE'?`Anticipo: Bs. ${amount} de Bs. ${total} total`:`Total a pagar: Bs. ${total}`;
+  const qImg=document.getElementById('qrImg');const qPh=document.getElementById('qrPlaceholder');
+  if(qImg&&qPh){if(qrUrl){qImg.src=qrUrl;qImg.style.display='';qPh.style.display='none';}else{qImg.style.display='none';qPh.style.display='flex';}}
+  const cw=document.getElementById('comprobanteWrap');if(cw)cw.style.display='';
+  const ww=document.getElementById('waChoiceWrap');if(ww)ww.style.display='';
+  checkPaymentReady();
+}
+document.addEventListener('input',e=>{if(['deliveryAddr','deliveryPhone','deliveryMeet'].includes(e.target.id))checkPaymentReady();});
+function previewComprobante(e){const file=e.target.files[0];if(!file)return;const r=new FileReader();r.onload=ev=>{document.getElementById('comprobantePreview').src=ev.target.result;document.getElementById('comprobantePreviewWrap').style.display='';document.getElementById('comprobanteData').value=ev.target.result;};r.readAsDataURL(file);}
+function clearComprobante(){document.getElementById('comprobanteData').value='';document.getElementById('comprobantePreviewWrap').style.display='none';document.getElementById('comprobanteInput').value='';}
+async function checkout(){
+  const delivType=document.getElementById('deliveryType').value;
+  const addr=delivType==='domicilio'?document.getElementById('deliveryAddr').value.trim():document.getElementById('deliveryMeet').value.trim();
+  const phone=document.getElementById('deliveryPhone').value.trim();
+  if(!addr||!phone){showToast('Completa direccion y telefono');return;}
+  if(!selectedPayment){showToast('Elige un metodo de pago');return;}
+  const total=cart.reduce((a,i)=>a+(i.price*i.qty),0);
+  const anticipo=Math.ceil(total*0.5);
+  let comprobanteUrl='';
+  const comprobanteFile=document.getElementById('comprobanteInput').files[0];
+  if(comprobanteFile){
+    showToast('Subiendo comprobante...');
+    const fn=`comprobante_${Date.now()}_${comprobanteFile.name.replace(/\s/g,'_')}`;
+    const{error:upErr}=await sb.storage.from('imagenes').upload(fn,comprobanteFile,{upsert:true});
+    if(!upErr){const{data:urlData}=sb.storage.from('imagenes').getPublicUrl(fn);comprobanteUrl=urlData.publicUrl;}
+  }
+  const note=document.getElementById('deliveryNote').value;
+  const order={id:'KUS'+Date.now(),user_id:currentUser.id,user_name:currentUser.name,user_email:currentUser.email,items:[...cart],total,status:'pendiente',payment_method:selectedPayment,delivery_address:addr,delivery_phone:phone,delivery_note:note,comprobante_url:comprobanteUrl};
+  const{error}=await sb.from('pedidos').insert(order);
+  if(error){showToast('Error al guardar el pedido');console.error(error);return;}
   for(const ci of cart){const p=products.find(x=>x.id===ci.id);if(p){p.sold=(p.sold||0)+ci.qty;p.stock=Math.max(0,p.stock-ci.qty);await sb.from('productos').update({sold:p.sold,stock:p.stock}).eq('id',p.id);}}
-  cart=[];updateCartBadge();closeModal('paymentModal');showToast('Pedido realizado! Te contactaremos pronto.');renderAll();
+  const itemsText=cart.map(i=>`• ${i.name}${i.size?' ('+i.size+')':''} x${i.qty} = Bs.${i.price*i.qty}`).join('\n');
+  const pagoText=selectedPayment==='QR'?`Pago total: Bs. ${total} por QR`:`Anticipo: Bs. ${anticipo} por QR + Bs. ${anticipo} al recibir`;
+  const entregaText=delivType==='domicilio'?`Domicilio: ${addr}`:`Punto de encuentro: ${addr}`;
+  const msg=encodeURIComponent(`🛍️ *NUEVO PEDIDO KUSTOM*\nPedido: ${order.id}\nCliente: ${currentUser.name}\nTel: ${phone}\n\n📦 *Productos:*\n${itemsText}\n\n💰 *Total: Bs. ${total}*\n💳 ${pagoText}\n\n📍 *Entrega:*\n${entregaText}\n${note?'📝 Nota: '+note+'\n':''}\n${comprobanteUrl?'✅ Comprobante subido en el sistema':'📸 Adjunto el comprobante de pago aqui:'}`);
+  const waNum=selectedWA===1?(config.wa1||'59165142115'):(config.wa2||'59165102615');
+  const waNumClean=waNum.replace(/\D/g,'');
+  cart=[];updateCartBadge();closeModal('paymentModal');
+  showToast('Pedido registrado! Abriendo WhatsApp...');
+  renderAll();
+  setTimeout(()=>window.open(`https://wa.me/${waNumClean}?text=${msg}`,'_blank'),800);
+}
+async function uploadQR(e){
+  const file=e.target.files[0];if(!file)return;
+  document.getElementById('qrStatus').textContent='Subiendo QR...';
+  const fn=`qr_pago_kustom_${Date.now()}`;
+  const{error}=await sb.storage.from('imagenes').upload(fn,file,{upsert:true});
+  if(error){document.getElementById('qrStatus').textContent='Error al subir';return;}
+  const{data}=sb.storage.from('imagenes').getPublicUrl(fn);
+  const qrUrl=data.publicUrl;
+  const{data:cfgData}=await sb.from('configuracion').select('colors').eq('id',1).single();
+  const colors={...(cfgData&&cfgData.colors||{}),qrUrl};
+  await sb.from('configuracion').update({colors}).eq('id',1);
+  config.qrUrl=qrUrl;config.colors=colors;
+  document.getElementById('qrAdminPreview').src=qrUrl;
+  document.getElementById('qrAdminPreviewWrap').style.display='';
+  document.getElementById('qrStatus').textContent='✓ QR guardado';
+  showToast('Codigo QR actualizado');e.target.value='';
 }
 
 // AUTH
@@ -872,7 +1001,7 @@ async function renderProfile(){
   document.getElementById('profileName').textContent=currentUser.name;document.getElementById('profileEmail').textContent=currentUser.email;document.getElementById('profileAvatar').textContent=currentUser.name.charAt(0).toUpperCase();
   const{data}=await sb.from('pedidos').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
   const od=document.getElementById('userOrders');if(!data||!data.length){od.innerHTML='<p style="color:var(--muted);font-size:13px">Aun no tienes pedidos</p>';return;}
-  od.innerHTML=data.map(o=>`<div class="ord-card"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span class="ord-id">${o.id}</span><span style="font-size:11px;color:var(--muted)">${new Date(o.created_at).toLocaleDateString('es-BO')}</span></div><div style="font-size:12px;color:var(--muted);margin-bottom:4px">${(o.items||[]).map(i=>`${i.name} x${i.qty}${i.size?' ('+i.size+')':''}`).join(', ')}</div><div style="display:flex;justify-content:space-between"><span style="font-size:14px;font-weight:700;color:var(--primary)">Bs. ${o.total}</span><span class="${o.status==='completado'?'s-comp':'s-pend'}">${(o.status||'').toUpperCase()}</span></div></div>`).join('');
+  od.innerHTML=data.map(o=>`<div class="ord-card"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span class="ord-id">${o.id}</span><span style="font-size:11px;color:var(--muted)">${new Date(o.created_at).toLocaleDateString('es-BO')}</span></div><div style="font-size:12px;color:var(--muted);margin-bottom:4px"><strong style="color:var(--text)">${o.user_name}</strong> · Tel: ${o.delivery_phone||'—'}</div><div style="font-size:11px;color:var(--muted);margin-bottom:4px">📍 ${o.delivery_address||'—'} · 💳 ${o.payment_method||'—'}</div><div style="font-size:11px;color:var(--muted);margin-bottom:4px">${(o.items||[]).map(i=>`${i.name} x${i.qty}${i.size?' ('+i.size+')':''}`).join(', ')}</div>${o.comprobante_url?`<div style="margin:6px 0"><a href="${o.comprobante_url}" target="_blank"><img src="${o.comprobante_url}" style="max-width:100px;max-height:80px;border:1px solid var(--border);cursor:pointer" title="Ver comprobante"></a><span style="font-size:10px;color:#A8D400;margin-left:8px">✅ Comprobante recibido</span></div>`:'<div style="font-size:10px;color:#EF9F27;margin:4px 0">⏳ Sin comprobante subido</div>'}<div style="display:flex;justify-content:space-between"><span style="font-size:14px;font-weight:700;color:var(--primary)">Bs. ${o.total}</span><span class="${o.status==='completado'?'s-comp':'s-pend'}">${(o.status||'').toUpperCase()}</span></div></div>`).join('');
 }
 function doSearch(){const q=document.getElementById('searchInput').value.toLowerCase();const r=products.filter(p=>p.name.toLowerCase().includes(q)||p.cat.toLowerCase().includes(q)||(p.marca&&p.marca.toLowerCase().includes(q))||(p.genero&&p.genero.toLowerCase().includes(q))||(p.subcat&&p.subcat.toLowerCase().includes(q)));document.getElementById('searchResults').innerHTML=r.length?r.map(p=>prodCard(p)).join(''):'<p style="color:var(--muted);font-size:13px">Sin resultados</p>';}
 function openInfoModal(tipo){const t={nosotros:'Sobre nosotros',envios:'Envios',cambios:'Cambios y devoluciones',preguntas:'Preguntas frecuentes',ubicacion:'Ubicacion'};const it=config.infoTexts||DEF_CFG.infoTexts;document.getElementById('infoModalTitle').textContent=t[tipo]||tipo;document.getElementById('infoModalBody').innerHTML=(it[tipo]||'').replace(/\n/g,'<br>');openModal('infoModal');}
@@ -882,7 +1011,12 @@ async function doAdminLogin(){const pass=document.getElementById('adminPass').va
 function doAdminLogout(){document.getElementById('adminPanel').classList.remove('open');}
 function exitAdmin(){document.getElementById('adminPanel').classList.remove('open');}
 async function switchAdminTab(el,tabId){document.querySelectorAll('.atab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.admin-section').forEach(s=>s.classList.remove('active'));el.classList.add('active');document.getElementById(tabId).classList.add('active');if(tabId==='tabDash')await renderDash();if(tabId==='tabProds')renderAdminProds();if(tabId==='tabOrders')await renderAllOrders();if(tabId==='tabUsers')await renderUsers();if(tabId==='tabMarcas')await renderMarcasAdmin();if(tabId==='tabCarousel')renderCarouselAdmin();}
-async function refreshAdmin(){await loadProducts();await renderDash();renderAdminProds();}
+async function refreshAdmin(){
+  await loadProducts();await renderDash();renderAdminProds();
+  // Show QR preview if exists
+  const qrUrl=config.qrUrl||(config.colors&&config.colors.qrUrl)||'';
+  if(qrUrl){const p=document.getElementById('qrAdminPreview');const w=document.getElementById('qrAdminPreviewWrap');if(p&&w){p.src=qrUrl;w.style.display='';}}
+}
 async function renderDash(){
   const{data:ords}=await sb.from('pedidos').select('*').order('created_at',{ascending:false});orders=ords||[];
   const sold=orders.reduce((a,o)=>a+(o.items||[]).reduce((b,i)=>b+i.qty,0),0);const rev=orders.reduce((a,o)=>a+Number(o.total),0);
